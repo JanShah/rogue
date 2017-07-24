@@ -1,8 +1,6 @@
 import styled from 'styled-components'
 
-let grid,grid1,grid2,grid3
-
-    grid = [`"grid" "enemies" "bonuses" "width" "height" "rooms"`,
+let grid = [`"grid" "enemies" "bonuses" "width" "height" "rooms"`,
     `"grid enemies" "bonuses width" "height rooms"`,
     `"grid enemies bonuses" "width height rooms"`,
     `"grid enemies bonuses width height rooms"`]

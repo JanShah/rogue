@@ -1,7 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 import Slider from './style'
-import './customStyle.css'
-import Label from '../label/'
+import './custom.css'
 
 
 
