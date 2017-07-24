@@ -1,7 +1,9 @@
 {
   "name": "rogue",
   "version": "0.1.0",
-  "private": true,
+  "credits": "react, ravenmore: http://dycha.net - weapon sprites  - Kazzador and Enterbrain  - enemy sprites",
+  "license": "MIT",
+  "private": false,
   "devDependencies": {
     "react-scripts": "1.0.10",
     "style-loader": "^0.18.2",
