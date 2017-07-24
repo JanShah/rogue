@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import Button from './components/button/'
-// import Input from './components/input/'
 import Slider from './components/slider/'
 import Box from './components/layout/box/'
 import Container from './components/layout/container/'
@@ -10,11 +9,11 @@ import optionMinMax from './constants/optionMinMax'
 import presets from './constants/presets'
 
 class Menu extends Component {
-  constructor() {
-    super() 
+  constructor(props) {
+    super(props) 
         let options = optionMinMax
         this.state={
-            started: false,
+            started: true,
             grid:options.grid.default,
             enemies:options.enemies.default,
             bonuses:options.bonuses.default,
@@ -24,9 +23,10 @@ class Menu extends Component {
             preset:0,
             cols:2
        }
-        this.endGame=this.endGame.bind(this)
+        this.gameState=this.gameState.bind(this)
         this.changeDefaults=this.changeDefaults.bind(this)
         this.presets=this.presets.bind(this)
+        this.definedGame=props.defineGame.bind(this)
     }
 
     componentDidMount() {
@@ -70,19 +70,29 @@ class Menu extends Component {
         })
     }
 
-    endGame() {
+    gameState() {
         this.setState({
             started:!this.state.started
-        })
+        })   
     }
 
     shouldComponentUpdate(first,second){
-        // console.log(second,this.state)
+        console.log('should component update')
+        if(second.started!==this.state.started) {
+            console.log(this.state.started,second)
+            this.passToParent(this.state)
+        }
+        // console.log(second.started===this.state.started)
         return true
     }
 
     componentDidUpdate() {
+        
         // console.log('component updated')
+    }
+
+    passToParent() {
+        this.definedGame(this.state)
     }
 
     presets() {
@@ -119,31 +129,27 @@ class Menu extends Component {
         window.onresize=this.changeWindow.bind(this)
         let p = this.state.preset
         let started = this.state.started?'Something':'Nothing'
-        let btnText = this.state.started?' End ':'Start'
+        let btnText = !this.state.started?' End ':'Start'
 
         return (
             <Container detail={['container']} cols={this.state.cols}>
-
-                {this.getBoxSlider(['grid',0,0,0,0,'white'])}
-                {this.getBoxSlider(['enemies',0,0,0,0,'white'])}
-                {this.getBoxSlider(['bonuses',0,0,0,0,'white'])}
-                {this.getBoxSlider(['width',0,0,0,0,'white'])}
-                {this.getBoxSlider(['height',0,0,0,0,'white'])}
-                {this.getBoxSlider(['rooms',0,0,0,0,'white'])}
+                
+                {this.getBoxSlider(['grid',1,1,1,1,'white',true])}
+                {this.getBoxSlider(['enemies',2,1,1,1,'white',true])}
+                {this.getBoxSlider(['bonuses',3,1,1,1,'white',true])}
+                {this.getBoxSlider(['width',3,1,3,1,'white',true])}
+                {this.getBoxSlider(['height',2,1,3,1,'white',true])}
+                {this.getBoxSlider(['rooms',1,1,3,1,'white',true])}
                 <Button 
                     primary={this.state.started} 
                     text={btnText} 
-                    fn={this.endGame}
+                    fn={this.gameState}
                 />
                 <Button 
                     primary={!this.state.started} 
                     text={p===4?'back to: '+presets[1].level:'Level: '+presets[p+1].level} 
                     fn={this.presets}
                 />
- 
-                App has {started} 
-
-
             </Container>
         )
     }
