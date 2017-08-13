@@ -31,7 +31,7 @@ export default function renderDungeon()
 			} 
 			else
 			{
-				room = dungeon[b-1]
+				room = dungeon[b-2]
 			}
 		})
 		return room

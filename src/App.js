@@ -12,68 +12,20 @@ import Label from './components/label/'
 import Loader from './components/images/Loader'
 import characterAnims from './options/characterAnims'
 import Rooms from './game/roomGenerator/Rooms'
-
-
-function showGame(room) {
-
-	let height
-	let scale = room.started?10:room.grid>74?2:3
-	
-	let width = height = room.grid*scale
-	let grid = room.sampleGrid
-	let canvas = document.getElementById('game')
-	if(canvas) {
-		canvas.width = width
-		canvas.height = height
-		let ctx = canvas.getContext('2d');
-		ctx.scale(scale,scale)
-		ctx.clearRect(0,0,width,height)
-		let y=-1
-		let x=-1;
-		let gItems =[]
-		grid.forEach((cell,id)=>{
-			if(cell===3){
-				ctx.fillStyle='black'
-			}
-			else if(cell===5){
-				ctx.fillStyle='#ca3e75'
-			}
-			else if(cell===6){
-				ctx.fillStyle='#ca6e75'
-			}
-			else if(cell===7){
-				ctx.fillStyle='blue'
-			}
-			else if(cell===8){
-				ctx.fillStyle='yellow'
-			}
-			else if(cell===9){
-				ctx.fillStyle='green'
-			}
-			else if(cell===2)ctx.fillStyle='green'
-			else if(cell===1)ctx.fillStyle='#333'
-			else ctx.fillStyle='#4f4f9c'
-			x+=1
-			if(id%room.grid===0) {
-				// console.log('new row',id,y)
-				x=0
-				y+=1
-			}
-			ctx.fillRect(x,y,1,1)
-			gItems.push(x,y)
-		})
-
-	}
-}
-
-
+import showGame from './game/demo/'
+import Game from './game/'
 class App extends Component {
 	constructor () {
 		super() 
 		let options = optionMinMax()
 		let width = window.innerWidth
 		let loader = new Loader()
+		this.showSampleGrids = true;
 		this.state={
+			window: {
+				width:window.innerWidth,
+				height:window.innerHeight
+			},
 			started: false,
 			grid:			options.grid.default,
 			enemies:	options.enemies.default,
@@ -91,11 +43,12 @@ class App extends Component {
 			hero:			'ninja_f',
 			loader:		loader
 		}
-		this.endGame=this.endGame.bind(this)
+		this.closeGame=this.closeGame.bind(this)
 		this.changeDefaults=this.changeDefaults.bind(this)
 		this.presets=this.presets.bind(this)
 		this.changeWindow=this.changeWindow.bind(this)
 		this.boyGirl=this.boyGirl.bind(this)
+		this.saveMap = this.saveMap.bind(this)
 	}
 
 	componentDidMount() {
@@ -107,21 +60,22 @@ class App extends Component {
 				font-family:'Cabin', sans-serif;
 			}
 		`;
+		this.changeWindow()
 	}
 
 	getCSS() {
-		let width = window.innerWidth
+		let width = this.state.window.width
 		let cols = width<500?1:width<800?2:width<1400?3:4
+		console.log('width',width,cols)
 		this.setState({cols:cols})
 	}
 
 	changeWindow() {
 		this.getCSS()
-
 	}
 
 	changeDefaults(value) {
-		// console.log('slider value being changed: ,',value)
+		console.log('slider value being changed: ,',value)
 		if(value[0]==='height') {
 			this.setState({
 				size: {
@@ -137,14 +91,20 @@ class App extends Component {
 				}
 			})
 		} 
+		else	if(value[0]==='grid') {
+			this.setState({
+				game:null
+			})
+		} 
 		this.setState({
 			[value[0]]: parseInt(value[1],10)
+			
 		})
 		
 
 	}
 
-	endGame() {
+	closeGame() {
 		this.setState({
 			started:!this.state.started
 		})
@@ -159,7 +119,7 @@ class App extends Component {
 		} else {
 			next = current+1
 		}
-		this.setState(presets[next])
+		this.setState({...presets[next],game:null})
 	}
 
 	boyGirl() {
@@ -217,31 +177,47 @@ class App extends Component {
 	}
 
 	showSampleGrid(grid) {
-		let sampleGrid = new Rooms(grid)
-		showGame({sampleGrid:sampleGrid.dungeon.render,grid:this.state.grid,started:this.state.started})
+		showGame({sampleGrid:grid.dungeon.render,grid:this.state.grid,started:this.state.started})
 	}
 
 	componentDidUpdate() {
 		// if(this.state.started)
-		this.showSampleGrid(this.state);
+		this.sampleGrid = new Rooms(this.state)
+		this.showSampleGrid(this.sampleGrid);
 	}
 
 	renderSample() {
 	}
 
+	saveMap(event) {
+		this.setState({
+			game:this.sampleGrid
+		})
+	}
 	getContainer() {
 		let playerlist = players(this.state.sex)
 		let presets = presetData()
 		let p = this.state.preset
 		let btnText = this.state.started?' End ':'Start'
 		let bGrid = boxGrid();
-		let pCols = this.state.cols===1?2:this.state.cols+1
+		let pCols = this.state.cols===1?1:this.state.cols
 		let pRows = this.state.cols===1?4:1
+		let alertText = this.state.game?'Map Saved. Changing dungeon width/height will delete your saved map':null
+		let saveButtontext = this.state.game?'Save this instead?':'Save this map'
+		
+		let retrieveSaved = this.state.game?<Button 
+							text={'load saved'} 
+							fn={this.showSampleGrid.bind(this,this.state.game)}/>:null
+		let saveButton = this.sampleGrid?<Button 
+							primary={this.state.started} 
+							text={saveButtontext}
+							fn={this.saveMap}
+						/>:null
 		return ( 
 			<Div>
 				<Container detail={['container']} cols={this.state.cols} rows={4}>
 					{Object.keys(bGrid).map((box,key)=>
-						<Div key={key} pad={'1px'}>
+						<Div key={key} pad={'10px'}>
 							{box!=='player'?this.getBoxSlider(bGrid[box]):<Button 
 								primary={!this.state.started} 
 								text={p===4?'back to: '+presets[1].level:'use level preset: '+presets[p+1].level} 
@@ -253,7 +229,7 @@ class App extends Component {
 						<Button 
 							primary={this.state.started} 
 							text={btnText} 
-							fn={this.endGame}
+							fn={this.closeGame}
 						/>
 					</Div>
 					<Div pad={'10px'}>
@@ -263,7 +239,7 @@ class App extends Component {
 				<Container detail={['player']} cols={pCols} rows={pRows}>	
 					{
 						playerlist.name.map((player,id)=>{	
-							let detail = this.state.cols===1?['',0,0,0,0]:['',1,1,id+1,1]
+							let detail = this.state.cols<=2?['',0,0,0,0]:['',1,1,id+1,1]
 							let selector = 'rgba(0,0,0,0.0)'
 							return (
 								<Box
@@ -273,6 +249,7 @@ class App extends Component {
 								{
 									this.state.loader.getURL(player)
 									?	<Canvas id={'pm_'+player} 
+											width={300}
 											onClick={this.selectHero.bind(this)} 
 											onMouseOver={
 												characterAnims.bind(this,
@@ -291,7 +268,28 @@ class App extends Component {
 					}
 				</Container>
 				<Div align='center'>
-					<Canvas id='game' />
+					<Container detail={['grids']} cols={pCols==1?2:pCols} template={'1fr 57px 20px'} stretch={'center'}>	
+						<Box
+							key={1} 
+							detail={['',3,1,1,2]}>
+							{alertText}
+						</Box>
+						<Box
+							key={2} 
+							detail={['',1,1,1,2]}>
+						<Canvas id='gameDemo' />
+						</Box>
+						<Box
+							key={3} 
+							detail={['',2,1,1,1]}>
+							{saveButton}
+						</Box>
+						<Box
+							key={4} 
+							detail={['',2,1,2,1]}>
+
+						{retrieveSaved}</Box>
+					</Container>
 				</Div>
 
 			</Div>
@@ -309,9 +307,9 @@ class App extends Component {
 				<Button 
 					primary={!this.state.started} 
 					text={btnText} 
-					fn={this.endGame}
+					fn={this.closeGame}
 				/>
-					<Canvas id='game'/>
+					<Game detail = {this.state}/>
 				</Div>
 	}
 }
