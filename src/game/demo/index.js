@@ -14,8 +14,8 @@ export default function showGame(room) {
 		let x=-1;
 		let gItems =[]
 		grid.forEach((cell,id)=>{
-			if(cell===3){
-				ctx.fillStyle='black'
+			if(cell===1){
+				ctx.fillStyle='#ca6e75'
 			}
 			else if(cell===5){
 				ctx.fillStyle='#ca3e75'
@@ -23,18 +23,18 @@ export default function showGame(room) {
 			else if(cell===6){
 				ctx.fillStyle='#ca6e75'
 			}
-			else if(cell===7){
-				ctx.fillStyle='blue'
+			else if(cell===4){
+				ctx.fillStyle='#2a2254' //outline
 			}
 			else if(cell===8){
 				ctx.fillStyle='yellow'
 			}
 			else if(cell===9){
-				ctx.fillStyle='green'
+				ctx.fillStyle='#2a2254'
 			}
-			else if(cell===2)ctx.fillStyle='green'
-			else if(cell===1)ctx.fillStyle='#333'
-			else ctx.fillStyle='#4f4f9c'
+			else if(cell===2)ctx.fillStyle='green' 
+			else if(cell===3)ctx.fillStyle='#666' //rooms
+			else ctx.fillStyle='#8f6690'
 			x+=1
 			if(id%room.grid===0) {
 				// console.log('new row',id,y)

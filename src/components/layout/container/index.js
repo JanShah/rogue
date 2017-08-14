@@ -7,8 +7,11 @@ function container(props) {
     rows={props.rows} 
     cols={props.cols} 
     grid={grid} 
+	gap={props.gap} 
+
     stretch={props.stretch}
     template={props.template}
+    templateCols={props.templateCols}
     >{props.children}</Container>
 }
 

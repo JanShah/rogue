@@ -9,12 +9,6 @@ function canvas(props)
 	{
 		return <GameCanvas 
 		id={props.id} 
-		position={props.position}
-		width={props.width}
-		height={props.height}
-		top={props.top}
-
-
 		/>
 	} 
 	else if(props.id.startsWith('pm')) 

@@ -3,7 +3,6 @@
 // size : object w: number, h: number
 // rooms: number
 
-
 import renderDungeon from './renderDungeon'
 import applyCentre from './applyCentre'
 import spaceOutRooms from './spaceOutRooms'
@@ -13,7 +12,6 @@ import Room from './Room'
 function makeRoomCoords(props)
 {
 	let dungeon				= []
-	console.log(props)
 	dungeon.grid 			= props.grid
 	dungeon.maxSize 	= props.size
 	dungeon.maxRooms 	= props.rooms
@@ -34,7 +32,7 @@ function makeRoomCoords(props)
 	spaceOut();
 	//trim the excess
 	trimmer()
-	//render the grid	
+	//grid to 1d array
 	renderGrid()
 
 	return dungeon

@@ -64,10 +64,15 @@ class App extends Component {
 	}
 
 	getCSS() {
-		let width = this.state.window.width
+		let width = window.innerWidth
 		let cols = width<500?1:width<800?2:width<1400?3:4
-		console.log('width',width,cols)
-		this.setState({cols:cols})
+		this.setState({
+			cols:cols,
+			window: {
+					width:width,
+					height:window.innerHeight
+				}
+		})
 	}
 
 	changeWindow() {
@@ -75,7 +80,6 @@ class App extends Component {
 	}
 
 	changeDefaults(value) {
-		console.log('slider value being changed: ,',value)
 		if(value[0]==='height') {
 			this.setState({
 				size: {
@@ -217,7 +221,7 @@ class App extends Component {
 			<Div>
 				<Container detail={['container']} cols={this.state.cols} rows={4}>
 					{Object.keys(bGrid).map((box,key)=>
-						<Div key={key} pad={'10px'}>
+						<Div key={key} pad={10}>
 							{box!=='player'?this.getBoxSlider(bGrid[box]):<Button 
 								primary={!this.state.started} 
 								text={p===4?'back to: '+presets[1].level:'use level preset: '+presets[p+1].level} 
@@ -225,18 +229,18 @@ class App extends Component {
 						/>}
 						</Div> 
 					)}
-					<Div pad={'10px'}>
+					<Div pad={10}>
 						<Button 
 							primary={this.state.started} 
 							text={btnText} 
 							fn={this.closeGame}
 						/>
 					</Div>
-					<Div pad={'10px'}>
+					<Div pad={10}>
 						{this.loadButton(playerlist.name[0])}
 					</Div>
 				</Container>
-				<Container detail={['player']} cols={pCols} rows={pRows}>	
+				<Container detail={['player']} cols={pCols===3?4:pCols} rows={pRows}>	
 					{
 						playerlist.name.map((player,id)=>{	
 							let detail = this.state.cols<=2?['',0,0,0,0]:['',1,1,id+1,1]
@@ -249,7 +253,7 @@ class App extends Component {
 								{
 									this.state.loader.getURL(player)
 									?	<Canvas id={'pm_'+player} 
-											width={300}
+											width={225}
 											onClick={this.selectHero.bind(this)} 
 											onMouseOver={
 												characterAnims.bind(this,
@@ -268,25 +272,25 @@ class App extends Component {
 					}
 				</Container>
 				<Div align='center'>
-					<Container detail={['grids']} cols={pCols==1?2:pCols} template={'1fr 57px 20px'} stretch={'center'}>	
-						<Box
-							key={1} 
-							detail={['',3,1,1,2]}>
-							{alertText}
-						</Box>
+					<Container detail={['grids']} cols={2} template={'1fr 27px 20px'} stretch={'center'}>	
 						<Box
 							key={2} 
 							detail={['',1,1,1,2]}>
 						<Canvas id='gameDemo' />
 						</Box>
 						<Box
+							key={1} 
+							detail={['',2,1,1,2]}>
+							{alertText}
+						</Box>
+						<Box
 							key={3} 
-							detail={['',2,1,1,1]}>
+							detail={['',3,1,1,1]}>
 							{saveButton}
 						</Box>
 						<Box
 							key={4} 
-							detail={['',2,1,2,1]}>
+							detail={['',3,1,2,1]}>
 
 						{retrieveSaved}</Box>
 					</Container>
@@ -299,11 +303,10 @@ class App extends Component {
 	render() {
 		let btnText = this.state.started?' End ':'Start'
 		let text = this.state
-		// window.onresize=this.changeWindow
+		window.onresize=this.changeWindow
 		return !this.state.started
-			?this.getContainer()
-			:	<Div height='720px'>
-				{console.log(text)}
+			?	this.getContainer()
+			:	<Div height={720}>
 				<Button 
 					primary={!this.state.started} 
 					text={btnText} 

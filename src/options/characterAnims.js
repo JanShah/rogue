@@ -1,6 +1,6 @@
 let heroDescriptions = {
 	ninja:{name:'Ninja',bonus:'visibility and mapping',extra:'see further for longer with ninja',mappedBonus:{14:1,18:2}},
-	mage: {name:'Mage',bonus:'extra potions',extra:'potions offer strength, weapons or health',mappedBonus:{16:1,19:2}},
+	mage: {name:'Mage',bonus:'extra potions',extra:'strength, weapon bonus or health',mappedBonus:{16:1,19:2}},
 	ranger: {name:'Ranger',bonus:'map trail bonus',extra:'trail your route and see maps',mappedBonus:{12:1,15:2}},
 	healer:{name:'Healer',bonus:'health pot & shield',extra:'live a lot longer with these',mappedBonus:{24:1,28:2}}
 }
@@ -27,12 +27,12 @@ function characterAnims(props) {
 			ctx.clearRect(0,0,canvas.width,canvas.height)
 			ctx.drawImage(props.loader.getImage(props.hero),frame,rotating[1],32,36,12,12,75,58)
 			ctx.fillStyle='#fef'
-			ctx.font='46px Arial'
+			ctx.font='30px Arial'
 			ctx.fillText(heroDescriptions[name].name,95,55)
 			ctx.font='20px Arial'
-			ctx.fillText(heroDescriptions[name].bonus,20,90)
-			ctx.font='14px Arial'
-			ctx.fillText(heroDescriptions[name].extra,20,110)
+			ctx.fillText(heroDescriptions[name].bonus,10,90)
+			ctx.font='12px Arial'
+			ctx.fillText(heroDescriptions[name].extra,10,110)
 			if(frameCount>8) {
 				frame+=32
 				frameCount=0;
