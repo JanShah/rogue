@@ -185,7 +185,6 @@ class App extends Component {
 	}
 
 	componentDidUpdate() {
-		// if(this.state.started)
 		this.sampleGrid = new Rooms(this.state)
 		this.showSampleGrid(this.sampleGrid);
 	}
@@ -198,6 +197,8 @@ class App extends Component {
 			game:this.sampleGrid
 		})
 	}
+
+
 	getContainer() {
 		let playerlist = players(this.state.sex)
 		let presets = presetData()
@@ -246,24 +247,25 @@ class App extends Component {
 							let detail = this.state.cols<=2?['',0,0,0,0]:['',1,1,id+1,1]
 							let selector = 'rgba(0,0,0,0.0)'
 							return (
+								
 								<Box
 									key={id} 
 									detail={[...detail,selector]}
 								>
+								<Canvas id={'pm_'+player} 
+									width={225}
+									onClick={this.selectHero.bind(this)} 				
+								/>					
 								{
 									this.state.loader.getURL(player)
-									?	<Canvas id={'pm_'+player} 
-											width={225}
-											onClick={this.selectHero.bind(this)} 
-											onMouseOver={
-												characterAnims.bind(this,
-													{	
-														loader:this.state.loader,
-														hero:player,
-														selected:this.state.hero
-													})
-											}
-										/>
+									?	(
+										characterAnims(
+											{	
+												loader:this.state.loader,
+												hero:player,
+												selected:this.state.hero
+											})
+										)
 									:null
 								}
 								</Box>
@@ -303,10 +305,10 @@ class App extends Component {
 	render() {
 		let btnText = this.state.started?' End ':'Start'
 		let text = this.state
-		window.onresize=this.changeWindow
+		// window.onresize=this.changeWindow
 		return !this.state.started
 			?	this.getContainer()
-			:	<Div height={720}>
+			:	<Div>
 				<Button 
 					primary={!this.state.started} 
 					text={btnText} 

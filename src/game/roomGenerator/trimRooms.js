@@ -2,9 +2,14 @@
 export default function trimRooms() 
 {
 	let dungeon = this
-	dungeon.filter((a,b)=>{
-		if (a.br.y>dungeon.grid||a.tl.y<0)
-			dungeon.splice(b,1)
+	let mark =[]
+	dungeon.map((a,b)=>{
+		if (a.br.y>=dungeon.grid-2||a.tl.y<=2||a.br.x>=dungeon.grid-2||a.tl.x<=2)
+		{
+			mark.push(b)
+		}
 	})
-	return dungeon
+	mark.reverse().forEach(num=>{
+		dungeon.splice(num,1)
+	})
 }

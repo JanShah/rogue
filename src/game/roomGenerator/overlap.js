@@ -1,27 +1,31 @@
 import moveRoom from './moveRoom'
+import rw from '../../general/functions/rw'
 
 export default function overlap(thisRoom,lastRoom) 
 {
+	// console.log(this)
+	this.moveRoom = moveRoom.bind(this)
 	let t = thisRoom
 	let l = lastRoom
 	let tc = t.centrePoint
 	let lc = l.centrePoint
-	let diff,move
+	let move
 	if(tc.x>=lc.x) 
 	{
-		diff = l.br.x-t.tl.x
-		move = {x:tc.x+(diff+2),y:tc.y}
-		if(diff<=t.size.w)
-			thisRoom = moveRoom(thisRoom,move)
-		//move right/left
+		move = {x:tc.x+3,y:tc.y}
 	}
-	if(tc.y>lc.y) 
+	else if(tc.x<lc.x) 
 	{
-		diff = l.br.y-t.tl.y
-		move = {x:tc.x,y:tc.y+(diff+2)}
-		if(diff<t.size.h)
-			thisRoom = moveRoom(thisRoom,move)
-		//move down/up
+		move = {x:tc.x-1,y:tc.y}
+	}
+	if(tc.y>=lc.y) 
+	{
+		move = {x:tc.x,y:tc.y+3}
 	} 
-	return thisRoom
+	else if(tc.y<lc.y) 
+	{
+		move = {x:tc.x,y:tc.y-1}
+	} 
+
+	return this.moveRoom(thisRoom,move)
 }

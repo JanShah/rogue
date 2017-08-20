@@ -1,14 +1,14 @@
-import rw from '../../general/functions/rw'
+import near from './near'
 
-export default function renderd() 
+export default function () 
 {
 	let d = this
 	let returnGrid=[]
-	for(let y = 1;y<=d.grid;y++) 
+	for(let y = 0;y<d.grid;y++) 
 	{
-		for(let x = 1;x<=d.grid;x++) 
+		for(let x = 0;x<d.grid;x++) 
 		{
-			if(y===1 || y%d.grid===0 || x===1 || x%d.grid===0) 
+			if(y===0 || y%d.grid===d.grid-1 || x===0 || x%d.grid===d.grid-1) 
 			{
 				returnGrid.push(9)
 			} 
@@ -18,164 +18,183 @@ export default function renderd()
 			}
 		}    
 	}
-
-
-	let findNearest = (compare) => {
-		let nearest = 10000
-		let room
-		d.filter((a,b)=>{
-			let lowest = Math.abs(a.cartesian-compare.cartesian)
-			if(lowest && lowest<nearest && !a.taken) {
-				nearest = lowest
-				a.taken=1
-
-				room = a
-			} 
-			else if(!lowest)
+	let spot = 
+	{
+		floor:1,
+		test2:2,
+		wall:3,
+		corridor:4,
+		altWall:5,
+		red:6,
+		centre:8,
+		test:9
+	}
+	let addRooms = (room)=>
+	{
+		let colorSpot = 	spot.floor
+		let tl = room.tl
+		let br = room.br
+		for(let y = tl.y;y<=br.y;y++)
+		{
+			for(let x = tl.x;x<=br.x;x++)
 			{
-				room = d[0]
+				returnGrid[y*d.grid+x] = colorSpot
+			}			
+		}
+	}
+
+	let addSpotToRooms = (room) =>
+	{
+		returnGrid[room.point] = spot.centre
+	}
+
+	let getNearestSpot = (room)=>
+	{
+		let x = room.centrePoint.x
+		let y = room.centrePoint.y
+		let nearest=100000
+		let bestRoom;
+		d.map(point =>{
+			let nearX = Math.abs(point.centrePoint.x-x)
+			let nearY = Math.abs(point.centrePoint.y-y)
+			let nearRoom = near({x:nearX,y:nearY})
+			if (nearRoom<nearest&&nearRoom>0&&!point.neighbour)
+			{
+				nearest = nearRoom
+				bestRoom = point
+			}
+			if(!bestRoom)
+			{
+				let item = d.filter(a=>{
+					return a.point<2000&&a.point>1000
+				})
+				bestRoom = item[0] || d[0]
+			}		
+		})	
+		room.nearest(bestRoom)
+	}
+
+	let addEastCorridors = (room) =>
+	{
+		let startX = room.centrePoint.x
+		let y = room.centrePoint.y
+		let endX = room.neighbour.centrePoint.x
+		if(startX<endX)
+		{
+			for(let x = startX;x<=endX;x++)
+			{
+				let point = y*d.grid+x
+				returnGrid[point] = spot.corridor
+			}
+		}
+	}
+
+	let addWestCorridors = (room)=>
+	{
+		let startX = room.neighbour.centrePoint.x
+		let y = room.centrePoint.y
+		let endX = room.centrePoint.x
+		if(startX<endX)
+		{
+			for(let x = startX;x<=endX;x++)
+			{
+				let point = y*d.grid+x
+				returnGrid[point] = spot.corridor
+			}
+		}
+	}
+
+	let addNorthCorridors = (room)=>
+	{
+		let startY = room.centrePoint.y
+		let x = room.neighbour.centrePoint.x
+		let endY = room.neighbour.centrePoint.y
+		if(startY<endY)
+		{
+			for(let y = startY;y<=endY;y++)
+			{
+				let point = y*d.grid+x
+				returnGrid[point] = spot.corridor
+			}
+		}
+	}
+	
+	let addSouthCorridors = (room)=>
+	{
+		let startY = room.neighbour.centrePoint.y
+		let x = room.neighbour.centrePoint.x
+		let endY = room.centrePoint.y
+		if(startY<endY)
+		{
+			for(let y = startY;y<=endY;y++)
+			{
+				let point = y*d.grid+x
+				returnGrid[point] = spot.corridor
+			}
+		}
+	}
+
+	let addOutline = grid => {
+		let size = d.grid
+		// console.log(...grid)
+		grid.forEach((a,b)=>
+		{
+			let n = {
+				a:b-size,
+				b:b+size,
+				l:b-1,
+				r:b+1
+			}
+			let rule = (grid[n.b]||grid[n.r])
+			if(!grid[b]&&rule&&b)
+			{
+			grid[b] = spot.wall
+			// console.log('n:',n,rule,a)
 			}
 		})
-		return room
-	}
-
-
-	let corridor = 2
-	let floor = 3
-	let outline = 4
-	let wall = 5
-	let centreSpot = 8
-	let blue = 7
-	let green = 9
-	if(d.length>1)
-	{	
-		for(let corridors = 0;corridors < d.length;corridors++) 
+		grid.reverse().forEach((a,b)=>
 		{
-			let thisRoom = d[corridors]
-			let nearRoom = findNearest(thisRoom)
-			let startX = thisRoom.centrePoint.x
-			let targetX = nearRoom.centrePoint.x
-			let startY = thisRoom.centrePoint.y
-			let targetY = nearRoom.centrePoint.y
-			let x,y
-			x = {
-				start:startX,
-				end:targetX
+			let n = {
+				a:b-size,
+				b:b+size,
+				l:b-1,
+				r:b+1
 			}
-			y = {
-				start:startY,
-				end:targetY
-			}
-			for(let up = y.start;up<=y.end;up++) {
-				let gridRef 
-				if(up===y.end) {
-					gridRef = (up+1)*d.grid+(x.start-1)
-					returnGrid[gridRef] = outline
-				}										
-				gridRef = up*d.grid+x.start
-				let wallLeft = gridRef-1
-				let wallRight = gridRef+1
-				returnGrid[wallLeft] = (returnGrid[wallLeft]===0||returnGrid[wallLeft]===floor)?outline:returnGrid[wallLeft]
-				returnGrid[wallRight] = (returnGrid[wallRight]===0||returnGrid[wallRight]===floor)?outline:returnGrid[wallRight]
-				returnGrid[gridRef] = corridor
-				
-			}
-
-			for(let up = y.end;up<=y.start;up++) {
-				let gridRef
-				if(up===y.end) {
-					gridRef = (up-1)*d.grid+(x.start+1)
-					returnGrid[gridRef] = outline
-				}						
-				gridRef = up*d.grid+x.start
-				let wallLeft = gridRef-1
-				let wallRight = gridRef+1
-				returnGrid[wallLeft] = (returnGrid[wallLeft]===0)?outline:returnGrid[wallLeft]
-				returnGrid[wallRight] = (returnGrid[wallRight]===0)?outline:returnGrid[wallRight]
-				returnGrid[gridRef] = corridor
-						}
-
-			for(let right = x.end;right<=x.start;right++) {
-				let gridRef
-				if(right===x.start) {
-					gridRef = (y.end+1)*d.grid+(right+1)
-					returnGrid[gridRef] = outline
-				}		
-				gridRef = y.end*d.grid+right		
-				let gridAbove = (y.end-1)*d.grid+right
-				let gridBelow = (y.end+1)*d.grid+right
-				returnGrid[gridAbove] = returnGrid[gridAbove]===0?outline:returnGrid[gridAbove]
-				returnGrid[gridBelow] = returnGrid[gridBelow]===0?outline:returnGrid[gridBelow]
-				returnGrid[gridRef] = corridor
-			}
-
-			for(let right = x.start;right<=x.end;right++) {
-				let gridRef
-				if(right===x.start) {
-					gridRef = (y.end-1)*d.grid+(right-1)
-					returnGrid[gridRef] = returnGrid[gridRef]===0?outline:returnGrid[gridRef]
-
-				}
-				gridRef = y.end*d.grid+right
-				let gridAbove = (y.end-1)*d.grid+right
-				let gridBelow = (y.end+1)*d.grid+right
-				returnGrid[gridAbove] = returnGrid[gridAbove]===0?outline:returnGrid[gridAbove]
-				returnGrid[gridBelow] = returnGrid[gridBelow]===0?outline:returnGrid[gridBelow]
-				returnGrid[gridRef] = corridor
-			}
-
-			// console.log(thisRoom.centrePoint,nearRoom)
-
-
-		}
-	}
-
-
-	for(let dCorners = 0;dCorners < d.length;dCorners++) 
-	{
-		let tl = d[dCorners].tl
-		let br = d[dCorners].br
-		for(var y = tl.y;y<br.y;y++) 
-		{
-			for(var x = tl.x;x<br.x;x++) 
+			let rule = (grid[n.b]||grid[n.r])
+			if(!grid[b]&&rule&&b)
 			{
-				if(y===tl.y) 
-				{
-					let gridRef = (y-1)*d.grid+x
-					returnGrid[gridRef] = returnGrid[gridRef]===0?outline:returnGrid[gridRef]
-					returnGrid[gridRef-1] = returnGrid[gridRef-1]===0?outline:returnGrid[gridRef-1]
-					returnGrid[gridRef+1] = returnGrid[gridRef+1]===0?outline:returnGrid[gridRef+1]
-				}
-				if(y===br.y-1) 
-				{
-					let gridRef = (br.y)*d.grid+x
-					returnGrid[gridRef] = returnGrid[gridRef]===0?outline:returnGrid[gridRef]		
-					returnGrid[gridRef-1] = returnGrid[gridRef-1]===0?outline:returnGrid[gridRef-1]
-					returnGrid[gridRef+1] = returnGrid[gridRef+1]===0?outline:returnGrid[gridRef+1]
-							
-				}				
-				if(x===tl.x) 
-				{
-					let gridRef = y*d.grid+x-1
-					returnGrid[gridRef] = returnGrid[gridRef]===0?outline:returnGrid[gridRef]
-				}
-				if(x===br.x-1) 
-				{
-					let gridRef = y*d.grid+br.x
-					returnGrid[gridRef] = returnGrid[gridRef]===0?outline:returnGrid[gridRef]					
-				}
-				returnGrid[y*d.grid+x] = floor
+			grid[b] = spot.wall
+			// console.log('n:',n,rule,a)
 			}
-		}
+		})
+		grid.reverse()
 	}
 
-	for(let dCentre = 0;dCentre < d.length;dCentre++) 
+	d.sort((a,b)=>
+	{
+		return a.point>b.point
+	})
+
+	if(d.length>1)
+	{
+		for(let room = 0;room<d.length;room++)
 		{
-			let x = d[dCentre].centrePoint.x
-			let y = d[dCentre].centrePoint.y
-			let gridRef = y*d.grid+x
-			returnGrid[gridRef] = centreSpot
+			getNearestSpot(d[room])
+			addEastCorridors(d[room])
+			addWestCorridors(d[room])	
+			addNorthCorridors(d[room])
+			addSouthCorridors(d[room])
+
 		}
+		for(let room = 0;room<d.length;room++)
+		{
+			addRooms(d[room])
+		 	addSpotToRooms(d[room])
+		}	
+		addOutline(returnGrid)	
+	}
+
+	//add render to dungeon object
 	d.render = returnGrid
 	return d
 }

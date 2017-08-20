@@ -12,27 +12,35 @@ function characterAnims(props) {
 	let frame=32
 	let rotating = [0,72]
 	if(canvas) {	
+		canvas.addEventListener("mouseover",()=>menuticker = window.requestAnimationFrame(tick))
 		let cancelTick=()=>{
 			window.cancelAnimationFrame(menuticker)
 			canvas.removeEventListener('mouseout',cancelTick)
 		}
 		canvas.addEventListener("mouseout", cancelTick.bind(this))
 		ctx = canvas.getContext('2d');
+		ctx.clearRect(0,0,canvas.width,canvas.height)
 		ctx.drawImage(props.loader.getImage(props.hero),frame,rotating[1],32,36,12,12,75,58)
 		let start=0
+		let fontSize =0
 		let frameCount = 0
 		let name = props.hero.slice(0,props.hero.length-2)
 		let animate=(delta)=> {
-			frameCount++
+			if(fontSize<30)
+			{
+				fontSize+=8
+			}
 			ctx.clearRect(0,0,canvas.width,canvas.height)
 			ctx.drawImage(props.loader.getImage(props.hero),frame,rotating[1],32,36,12,12,75,58)
 			ctx.fillStyle='#fef'
-			ctx.font='30px Arial'
+
+			ctx.font=fontSize+'px Arial'
 			ctx.fillText(heroDescriptions[name].name,95,55)
 			ctx.font='20px Arial'
 			ctx.fillText(heroDescriptions[name].bonus,10,90)
 			ctx.font='12px Arial'
 			ctx.fillText(heroDescriptions[name].extra,10,110)
+			frameCount++
 			if(frameCount>8) {
 				frame+=32
 				frameCount=0;
@@ -58,11 +66,10 @@ function characterAnims(props) {
 			let delta = (timestamp-start) / 1000.0;
 			delta = Math.min(delta, 0.25); 
 			animate(delta)
-			if(progress>13000)
+			if(progress>8000)
 				cancelTick()
 			else menuticker = window.requestAnimationFrame(tick)
 		}
-		menuticker = window.requestAnimationFrame(tick)
 	}
 }
 export default characterAnims

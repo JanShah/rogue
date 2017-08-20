@@ -1,6 +1,6 @@
 export default function showGame(room) {
 	let height
-	let scale = room.started?10:room.grid>74?2:3
+	let scale = room.started?10:room.grid>74?3:4
 	let width = height = room.grid*scale
 	let grid = room.sampleGrid
 	let canvas = document.getElementById('gameDemo')
@@ -12,29 +12,29 @@ export default function showGame(room) {
 		ctx.clearRect(0,0,width,height)
 		let y=-1
 		let x=-1;
-		let gItems =[]
+
+		// floor:1,
+		// test2:2,
+		// wall:3,
+		// corridor:4,
+		// altWall:5,
+		// red:6,
+		// centre:8,
+		// test:9
+		let cellColor=
+		{
+			0:'#444',
+			1:'#7f8472',
+			2:'#727f84',
+			3:'#7a3f7b',
+			4:'#7f8472',
+			5:'white',
+			6:'red',
+			8:'yellow',
+			9:'#2a2254'
+		}
 		grid.forEach((cell,id)=>{
-			if(cell===1){
-				ctx.fillStyle='#ca6e75'
-			}
-			else if(cell===5){
-				ctx.fillStyle='#ca3e75'
-			}
-			else if(cell===6){
-				ctx.fillStyle='#ca6e75'
-			}
-			else if(cell===4){
-				ctx.fillStyle='#2a2254' //outline
-			}
-			else if(cell===8){
-				ctx.fillStyle='yellow'
-			}
-			else if(cell===9){
-				ctx.fillStyle='#2a2254'
-			}
-			else if(cell===2)ctx.fillStyle='green' 
-			else if(cell===3)ctx.fillStyle='#666' //rooms
-			else ctx.fillStyle='#8f6690'
+			ctx.fillStyle=cellColor[cell]	
 			x+=1
 			if(id%room.grid===0) {
 				// console.log('new row',id,y)
@@ -42,7 +42,6 @@ export default function showGame(room) {
 				y+=1
 			}
 			ctx.fillRect(x,y,1,1)
-			gItems.push(x,y)
 		})
 
 	}

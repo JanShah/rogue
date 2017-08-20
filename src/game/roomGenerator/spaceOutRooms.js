@@ -2,29 +2,44 @@ import overlap from './overlap'
 
 export default function spaceOutRooms() 
 {
-	let dungeon = this;
-	let count = dungeon.length-1
-	while(count)
+	let overlapped=1
+	let tries = 0;
+	let d = this;
+	this.overlap = overlap.bind(this)
+	while(overlapped)
 	{
-		for(let room = 0;room<dungeon.length;room++)
+		let count = d.length-1
+		if (tries>100) {
+			break
+		};
+		overlapped = 0;
+		while(count)
 		{
-			if(room!==count)
+			// console.log(tries)
+			for(let room = 0;room<d.length;room++)
 			{
-				let dr = dungeon[room]//this room
-				let dc = dungeon[count]//compare with this room
-				let rule = 	
-				dr.br.x+1>=dc.tl.x &&//from left
-				dr.tl.x-1<=dc.br.x &&//from right
-				dr.br.y+1>=dc.tl.y &&//from top
-				dr.tl.y-1<=dc.br.y   //from bottom
-				if(rule) {
-					dungeon[room] = overlap(dungeon[room],dungeon[count])
+				if(room!==count)
+				{
+					let dr = d[room]//this room
+					let dc = d[count]//compare with this room
+					//allow one extra overlap
+					let overlap = 2
+					let rule = 	
+					dr.br.x+overlap>=dc.tl.x &&
+					dr.tl.x-overlap<=dc.br.x &&
+					dr.br.y+overlap>=dc.tl.y &&
+					dr.tl.y-overlap<=dc.br.y   
+					if(rule) {
+						overlapped = 1;
+						d[room] = this.overlap(d[room],d[count])
+					}
 				}
 			}
+			//reduce counter
+			count-=1
 		}
-		//reduce counter
-		count-=1
+		tries++
 	}
 
-	return dungeon
+	return d
 }

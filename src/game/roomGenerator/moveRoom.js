@@ -6,7 +6,7 @@ import Size from './Size'
 export default function moveRoom(room,move) 
 {
 	let newRoom = new Room()
-	newRoom.sizes(new Size({h:10,w:10}))
-	newRoom.centre(new Point(move))
+	newRoom.sizes(room.size)
+	newRoom.centre({point:new Point(move),grid:this.grid})
 	return newRoom
 }
