@@ -14,6 +14,7 @@ import characterAnims from './options/characterAnims'
 import Rooms from './game/roomGenerator/Rooms'
 import showGame from './game/demo/'
 import Game from './game/'
+
 class App extends Component {
 	constructor () {
 		super() 
@@ -54,7 +55,7 @@ class App extends Component {
 	componentDidMount() {
 		injectGlobal`
 			body {
-				background:#707070;
+				background:#666;
 				margin:0;
 				padding:0;    
 				font-family:'Cabin', sans-serif;
@@ -220,7 +221,7 @@ class App extends Component {
 						/>:null
 		return ( 
 			<Div>
-				<Container detail={['container']} cols={this.state.cols} rows={4}>
+				<Container detail={['container']} cols={this.state.cols===1?2:this.state.cols===2?4:9} rows={1}>
 					{Object.keys(bGrid).map((box,key)=>
 						<Div key={key} pad={10}>
 							{box!=='player'?this.getBoxSlider(bGrid[box]):<Button 

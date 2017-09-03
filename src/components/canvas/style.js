@@ -18,7 +18,7 @@ let PlayerMenuCanvas = Canvas.extend`
 ${props=>props.height?'height:'+props.height+'px;':null}
 ${props=>props.width?'width:'+props.width+'px;':null};
 margin-top:2px;
-background:#333;
+background:#666;
 `
 
 export default Canvas

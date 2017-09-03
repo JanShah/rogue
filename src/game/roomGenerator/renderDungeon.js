@@ -1,3 +1,4 @@
+import rw from '../../general/functions/rw'
 import near from './near'
 
 export default function () 
@@ -20,16 +21,18 @@ export default function ()
 	}
 	let spot = 
 	{
-		floor:1,
+		floor:rw(100,120),
 		test2:2,
-		wall:3,
-		corridor:4,
+		wall:5,
+		corridor:2,
 		altWall:5,
 		red:6,
 		centre:8,
-		test:9
+		test:9,
+		start:999,
+		exit:200
 	}
-	let addRooms = (room)=>
+	let addRooms = room=>
 	{
 		let colorSpot = 	spot.floor
 		let tl = room.tl
@@ -38,17 +41,25 @@ export default function ()
 		{
 			for(let x = tl.x;x<=br.x;x++)
 			{
-				returnGrid[y*d.grid+x] = colorSpot
+				returnGrid[y*d.grid+x] = rw(100,120)
 			}			
 		}
 	}
-
-	let addSpotToRooms = (room) =>
+	let addStartingPoint = room =>
+	{
+		console.log(room)
+		returnGrid[room.point] = spot.start
+		d.startingPoint = room.centrePoint
+	}
+	let addExitPoint = room =>
+	{
+		returnGrid[room.point] = spot.exit
+	}
+	let addSpotToRooms = room =>
 	{
 		returnGrid[room.point] = spot.centre
 	}
-
-	let getNearestSpot = (room)=>
+	let getNearestSpot = room=>
 	{
 		let x = room.centrePoint.x
 		let y = room.centrePoint.y
@@ -73,8 +84,7 @@ export default function ()
 		})	
 		room.nearest(bestRoom)
 	}
-
-	let addEastCorridors = (room) =>
+	let addEastCorridors = room =>
 	{
 		let startX = room.centrePoint.x
 		let y = room.centrePoint.y
@@ -88,8 +98,7 @@ export default function ()
 			}
 		}
 	}
-
-	let addWestCorridors = (room)=>
+	let addWestCorridors = room=>
 	{
 		let startX = room.neighbour.centrePoint.x
 		let y = room.centrePoint.y
@@ -103,8 +112,7 @@ export default function ()
 			}
 		}
 	}
-
-	let addNorthCorridors = (room)=>
+	let addNorthCorridors = room=>
 	{
 		let startY = room.centrePoint.y
 		let x = room.neighbour.centrePoint.x
@@ -117,9 +125,8 @@ export default function ()
 				returnGrid[point] = spot.corridor
 			}
 		}
-	}
-	
-	let addSouthCorridors = (room)=>
+	}	
+	let addSouthCorridors = room=>
 	{
 		let startY = room.neighbour.centrePoint.y
 		let x = room.neighbour.centrePoint.x
@@ -133,8 +140,8 @@ export default function ()
 			}
 		}
 	}
-
-	let addOutline = grid => {
+	let addOutline = grid => 
+	{
 		let size = d.grid
 		// console.log(...grid)
 		grid.forEach((a,b)=>
@@ -177,6 +184,7 @@ export default function ()
 
 	if(d.length>1)
 	{
+		let createExitRoom=rw(2,d.length-1)
 		for(let room = 0;room<d.length;room++)
 		{
 			getNearestSpot(d[room])
@@ -189,12 +197,24 @@ export default function ()
 		for(let room = 0;room<d.length;room++)
 		{
 			addRooms(d[room])
-		 	addSpotToRooms(d[room])
+			if(room===createExitRoom)
+			{
+				addExitPoint(d[room])
+			}
+			if(room===0)
+			{
+				addStartingPoint(d[room])
+			}
+			else
+			{
+				addSpotToRooms(d[room])
+			}
 		}	
 		addOutline(returnGrid)	
 	}
 
 	//add render to dungeon object
+
 	d.render = returnGrid
 	return d
 }

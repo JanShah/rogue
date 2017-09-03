@@ -20,11 +20,12 @@ import reduceBonuses from '../game/gameFunctions/reduceBonuses'
 import whatIsBonus from '../game/gameFunctions/whatIsBonus'  
 import seeBonus from '../game/gameFunctions/seeBonus'
 import drawBonus from '../game/gameFunctions/drawBonus'
+import drawFloor from '../game/gameFunctions/drawFloor'
 
 
 export default class {
   constructor(props) {
-    console.log(props)
+    console.log('game props',props)
     this.enemies=[]
     this.menuPaths=[]
     this.loader= props.loader
@@ -37,6 +38,7 @@ export default class {
     // this.getXP=getXP.bind(this)
     this.getAll=getAll.bind(this)
     this.drawEnemies=drawEnemies.bind(this,props)
+    this.drawFloor=drawFloor.bind(this,props)
     this.getSprite=getSprite.bind(this)
     this.sa=0
     this.skipCount=0
@@ -61,9 +63,10 @@ export default class {
       rows:props.map.rows,
       cols:props.map.cols
     }
-  //   this.removeMarker=(x,y)=>{
-  //     props.updateMap([y*nap.cols+x],3)
-  //   }
+    this.removeMarker=(x,y,layer)=>{
+      // console.log('removing marker',x,y)
+      props.updateMap([y*nap.cols+x],layer)
+    }
      this.drawLayer =  drawLayer.bind(this,props)
   }
 

@@ -5,12 +5,12 @@ class BonusLayer {
   constructor(props) {
     this.cells = props.map(cell=>{
       let newCell
-      if(cell===1||cell===2||cell===3)
+      if(cell>=100&&cell<=120)
       {
-        if(rw(0,100)>85)
+        if(rw(0,100)>90)
         {
           // console.log('valid cell')
-          newCell = rw(6,9)
+          newCell = rw(6,39)
         }
         else
         {
@@ -28,10 +28,10 @@ class BonusLayer {
 
 class Enemies {
   constructor(props) {
-    let odds = 55
+    let odds = 90
     this.cells = JSON.parse(JSON.stringify(props))
     .map((a,b)=>{
-      return (a===1)?
+      return (a>=100&&a<=120)?
       rw(0,100)>odds?rw(41,48):0
       :0
     })
@@ -45,24 +45,25 @@ export default class Maps {
     let game
     if(!props.detail.game)
     {
-      game = new Rooms(props.detail).dungeon.render
+      game = new Rooms(props.detail)
     }
     else
     {
-      game = props.detail.game.dungeon.render
+      game = props.detail.game
     }
+
+    console.log(game.dungeon.startingPoint)
     this.tsize=64
     this.bsize=23
+    this.startingPoint = game.dungeon.startingPoint
     let floorLayer = new Layer({grid:this.cols,no:1})
-    let rooms =game
-    props.notifier('generated rooms')
+    let rooms = game.dungeon.render
     let bonuses = new BonusLayer(rooms).cells
-    props.notifier('generated bonuses')
     let enemies = new Enemies(bonuses).cells
-    props.notifier('generated enemies')
-
+    
     this.layers=[floorLayer, rooms, bonuses, enemies]
     this.getTile=(index,col,row)=>{return this.layers[index][row * this.cols + col]}
+
     this.makeTrail = (x,y)=>{ this.layers[0][x * this.cols + y] = 2}
     this.whatTile=(x,y)=>{
       let col = Math.floor(x / this.tsize);

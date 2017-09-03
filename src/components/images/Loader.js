@@ -16,6 +16,8 @@ import enemies45 from '../../assets/enemies/_enemy_45.png'
 import enemies46 from '../../assets/enemies/_enemy_46.png'
 import enemies47 from '../../assets/enemies/_enemy_47.png'
 import enemies48 from '../../assets/enemies/_enemy_48.png'
+import floor from '../../assets/floor.png'
+
 let images = {
   tiles: tilesquares,
   mage_m: mage_m,
@@ -34,7 +36,8 @@ let images = {
   enemies46: enemies46,
   enemies47: enemies47,
   enemies48: enemies48,
-  screen: screen
+  screen: screen,
+  floor:floor
 }
 
 export default class Loader {

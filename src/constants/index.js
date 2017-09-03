@@ -104,37 +104,37 @@ export const optionMinMax=()=>{
 	return {
 		grid:{
 			min:50,
-			max:150,
+			max:500,
 			default:70,
 			name:'grid',
 			label:'Dungeon Width/Height'},
 		enemies:{
 			min:5,
-			max:30,
+			max:50,
 			default:14,
 			name:'enemies',
 			label:'Chance of enemies'},
 		bonuses:{
 			min:5,
-			max:30,
+			max:50,
 			default:12,
 			name:'bonuses',
 			label:'Chance of bonuses'},
 		width:{
-			min:10,
-			max:30,
+			min:5,
+			max:50,
 			default:12,
 			name:'width',
 			label:'Max Width of each room'},
 		height:{
-			min:10,
-			max:30,
+			min:5,
+			max:50,
 			default:12,
 			name:'height',
 			label:'Max height of each room'},
 		rooms:{
 			min:5,
-			max:25,
+			max:300,
 			default:7,
 			name:'rooms',
 			label:'Maximum Number of rooms'}

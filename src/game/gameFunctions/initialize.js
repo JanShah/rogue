@@ -4,6 +4,7 @@ import Keyboard from  './Keyboard'
 
 export default function initialize(props) 
 {
+  // console.log('initialise game: ',props)
   let nap = {
     width:800,
     height:600
@@ -22,16 +23,19 @@ export default function initialize(props)
   //load the major assets
   //tileAtlas includes wall, floors, bonuses etc  
   this.tileAtlas = this.loader.getImage('tiles');
+  this.floorTile = this.loader.getImage('floor');
   //screen menu is the box on the right
   this.screenMenu = this.loader.getImage('screen')
   //initial hero
+    
   this.hero = new Hero({
+    hero:props.hero,
     loader:this.loader, 
     map:props.map,
     updateMap:props.updateMap.bind(this),
     drawStats:this.drawStats.bind(this),
     notifier:props.notifier,
-    x:400, y:400,
+    x:2400, y:2400,
     enemies:this.enemies
   });
   props.notifier('Hero is on the move')

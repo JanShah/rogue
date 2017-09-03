@@ -12,11 +12,10 @@ export default function showGame(room) {
 		ctx.clearRect(0,0,width,height)
 		let y=-1
 		let x=-1;
-
-		// floor:1,
+		// floor:40,
 		// test2:2,
-		// wall:3,
-		// corridor:4,
+		// wall:5,
+		// corridor:1,
 		// altWall:5,
 		// red:6,
 		// centre:8,
@@ -24,17 +23,26 @@ export default function showGame(room) {
 		let cellColor=
 		{
 			0:'#444',
-			1:'#7f8472',
+			1:'blue',
 			2:'#727f84',
 			3:'#7a3f7b',
 			4:'#7f8472',
-			5:'white',
+			5:'black',
 			6:'red',
 			8:'yellow',
-			9:'#2a2254'
+			40:'grey',
+			101:'skyblue'
 		}
 		grid.forEach((cell,id)=>{
-			ctx.fillStyle=cellColor[cell]	
+			if(cell>=100&&cell<=120)
+			{
+				ctx.fillStyle=cellColor[101]	
+				
+			}
+			else
+			{
+				ctx.fillStyle=cellColor[cell]	
+			}
 			x+=1
 			if(id%room.grid===0) {
 				// console.log('new row',id,y)

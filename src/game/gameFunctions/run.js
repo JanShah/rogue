@@ -2,19 +2,29 @@ export default function run (canvas)
 {
   this.ctx=canvas.getContext('2d');
   //change scale to see more //change camera scale to match as multiple
-  //this.ctx.scale(.5,.5)
-  let ticker
+  // this.ctx.scale(.3,.3)
   this.lastTime = 0
-  let p = this.load();
-  Promise.all(p).then(function () 
+  let p = ()=>this.loader.images
+  
+  this.init();
+  let start=()=>
   {
-    this.endGame = () =>{
-    window.cancelAnimationFrame(this.ticker);
-  }
-    //initialise a new game
-    this.init();
-    //this is outside animation loop so updates are manual.. 
     this.ticker= window.requestAnimationFrame(this.tick);
-    this.drawStats() 
-  }.bind(this));
+  }
+  start()
+  this.endGame = () =>{
+  //  console.log('ending game',cancelAnimationFrame(this.ticker))
+  this.ticker = window.cancelAnimationFrame(this.ticker);
+  this.ticker=0
+  }
+  // this.drawStats() 
+
+  // console.log(this.loader.images)
+
+  // Promise.all(p).then(function () 
+  // {
+  
+  //   //initialise a new game
+  //   //this is outside animation loop so updates are manual.. 
+  // }.bind(this));
 }

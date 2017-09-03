@@ -9,9 +9,9 @@ export default function getAll(delta)
     //update the screen
     this.heroMove(delta)
     //auto reduce map bonuses once gained, makes it harder to play?
-    this.reduceBonuses()
+    // this.reduceBonuses()
     //match circle range to hero visibility range
     this.visibility();   
-    this.veil()
+    // this.veil()
 
 }

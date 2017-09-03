@@ -12,19 +12,19 @@ function mathit(value){
 export default class Hero {
   constructor(props) 
   {
-
+    let startPoint = props.map.startingPoint
     this.stats=new Stats()
     this.map= props.map
-    this.x= props.x
-    this.y = props.y
+    this.x= startPoint.x*props.map.tsize
+    this.y = startPoint.y*props.map.tsize
     this.frameWidth=96
-    this.frameHeight=188
+    this.frameHeight=144
     this.width= 32
-    this.height= 47
+    this.height= 36
     this.visibility=200
     this.defence=0;
-    this.image=props.loader.getImage('viking-red')
-    this.SPEED=256
+    this.image=props.loader.getImage(props.hero)
+    this.SPEED=560
     this.positions = positions.bind(this)
     let timer=900;
     this.heal=()=>{
@@ -222,7 +222,7 @@ export default class Hero {
 
           let enemyHit = fought.hitPoints/2 - (this.defence *2)
 
-          let hitCalculate = !enemyHit?1:enemyHit
+          let hitCalculate = enemyHit<1?1:enemyHit
           let xpGained = Math.cbrt(hitCalculate)
 
           //console.log('enemy hit :',fought.hitPoints,hitCalculate,'XP Gained: ',xpGained)
@@ -250,23 +250,27 @@ export default class Hero {
           if (!collision) { return; } 
 
           else if (collision[0]=== 'bonus'||collision[0]=== 'backpack'){
-            let bon = bonusNames[collision[2]][0]
+            // console.log(collision)
+            let bon = bonusNames()[collision[2]][0]
             //collision 1 is the new map.. 
             //pack doesnt' increase carry load
            if(collision[0]=== 'backpack') {
               this.stats.capacity+=10;
               props.notifier('capacity increased to '+this.stats.capacity);
               props.updateMap(collision[1],2)
+              this.stats.pickedBonuses+=1
               props.drawStats();
             }
             //only add to carrying if not full and not a backpack
             if(this.stats.capacity>this.stats.carrying&&collision[0]!== 'backpack') {
+              // console.log('bonus: ',collision,props )
               this.stats.carrying+=1
+              this.stats.pickedBonuses+=1
               props.notifier('picked up : '+bon);
               props.notifier('you have '+this.stats.carrying+' of '+this.stats.capacity+' capacity');
               props.updateMap(collision[1],2)
               props.drawStats();
-              //funny effect on bottom right, but not top left?
+             
             } else  return
           }
 

@@ -2,11 +2,12 @@ export default class Camera {
   constructor(props) {
     this.y=0
     this.x=0
+    let scale =1
     //adding some height and width to camera to prevent edge jerking
-    this.width    = props.width+props.map.tsize
-    this.height   = props.height+props.map.tsize
-    this.maxX     = props.map.cols * props.map.tsize - props.width
-    this.maxY     = props.map.rows * props.map.tsize - props.height
+    this.width    = scale*(props.width+props.map.tsize)
+    this.height   = scale*(props.height+props.map.tsize)
+    this.maxX     = scale*(props.map.rows * props.map.tsize - props.width)
+    this.maxY     = scale*(props.map.cols * props.map.tsize - props.height)
     this.follow   = (sprite)=>{
       this.following  = sprite
       sprite.screenX  =0
