@@ -1,5 +1,6 @@
 export default function drawBonus(props,layer,tile,x,y,ctx)
 {
+  
   ctx.drawImage(
     this.tileAtlas, // image
     (tile - 1) * props.map.tsize, // source x

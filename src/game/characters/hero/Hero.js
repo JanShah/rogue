@@ -4,9 +4,6 @@ import positions from '../positions'
 import getHP from '../getHP'
 import xpBar from '../xpBar'
 let newDelta
-function mathit(value){
-      return Math.round(value)
-    }
 
 
 export default class Hero {
@@ -24,21 +21,16 @@ export default class Hero {
     this.visibility=200
     this.defence=0;
     this.image=props.loader.getImage(props.hero)
-    this.SPEED=560
+    this.SPEED=256
     this.positions = positions.bind(this)
-    let timer=900;
+    let timer=200;
     this.heal=()=>{
       timer--
-      if(!timer) {
-        if(this.stats.hp>=this.stats.maxHP) {
-          timer=5000
-          this.stats.maxHP+=0.5
-        } 
-        else 
-        {
-          this.stats.hp+=1
-        }
-
+      if(!timer)
+      {
+        console.log('healing')
+        this.stats.hp+=1
+        timer=200          
       }
     }
 
@@ -63,36 +55,69 @@ export default class Hero {
     this.useHealthPots = function()
     {
       if(this.stats.bonuses[26]) {
-        if(this.stats.hp<this.stats.maxHP)
+        if(this.stats.hp+35<this.stats.maxHP)
         {
+          props.notifier('used Healing Pot for 35')
           this.stats.hp+=35;
-          this.stats.bonuses[26]-=1
+          if(this.stats.hp===this.stats.maxHP)
+          {
+            props.notifier('Fully Healed!')
+          }
+           this.stats.bonuses[26]-=1
         }
       }
     }
 
+    this.useGems = function()
+    {
+      if(this.stats.bonuses[6]) 
+      {
+        props.notifier('Blue Gem: increased Max HP by 10')
+        this.stats.maxHP+=10;
+        this.stats.hp+=10;
+        this.stats.bonuses[6]-=1
+      }
+      if(this.stats.bonuses[7]) 
+      {
+        if(this.stats.hp+20<this.stats.maxHP)
+        {
+          props.notifier('Green Gem: restored HP by 20')
+          this.stats.hp+=20;
+          this.stats.bonuses[7]-=1
+        }
+      }
+      if(this.stats.bonuses[8]) 
+      {
+        props.notifier('Red Gem: increased XP by 5')
+        this.stats.xp+=5
+        this.stats.bonuses[8]-=1
+      }
+    }
+
+
     this.defenceBonus = function() 
     {
       //console.log('called for defence Bonus',this.defence)
-      const bon = bonusNames
+      const bon = bonusNames()
 
       //defence pots
       if(this.stats.bonuses[27]) 
       {
-        props.notifier('Used  :'+bon[27][0]+' for '+bon[27][4]+ ' defence');
+        props.notifier('Potion  :'+bon[27][0]+' for '+bon[27][4]+ ' defence');
+        console.log(this.bonusUses)
+        this.bonusUses.defPotion+=1
         this.counts.potions=true
         if(!this.bonusUses.defPotion)
         {
           this.defence += bon[27][4]
           //console.log('adding potion',this.defence)
         }
-        this.bonusUses.defPotion+=1
         if(this.bonusUses.defPotion>5) 
         {
+          props.notifier(bon[27][0]+'emptied. Dropped')          
           this.stats.bonuses[27]-=1
           this.defence -= bon[27][4]
           this.bonusUses.defPotion=0;
-          this.stats.carrying-=1
 
           //console.log('removing potion',this.defence)
           
@@ -115,15 +140,16 @@ export default class Hero {
             this.defence += bon[i][2]
           }
           this.bonusUses.shield+=1
-          props.notifier('Used  :'+bon[i][0]+' for '+bon[i][2]+ ' defence');
-          if(this.bonusUses.shield>8) 
+          props.notifier('shield:'+bon[i][0]+'  '+bon[i][2]+ ' def. uses: ' +this.bonusUses.shield+'/10');
+          if(this.bonusUses.shield>=10) 
           {
-            this.stats.bonuses[i]-=1
+            props.notifier(bon[i][0]+ ' depleted. Dropped');
             this.defence -= bon[i][2]
+            this.stats.bonuses[i]-=1
             this.bonusUses.shield=0
-            this.stats.carrying-=1
-          return;
+            return;
           }
+          return //break the loop
         } 
         else 
         {
@@ -140,17 +166,19 @@ export default class Hero {
           this.counts.armour=true
           if(!this.bonusUses.armour)
           {
+            // console.log(bon)
             this.defence += bon[j][2]
           }
           this.bonusUses.armour+=1
-          props.notifier('Used  :'+bon[j][0]+' for '+bon[j][2]+ ' defence');
+          props.notifier('armour  :'+bon[j][0]+' for '+bon[j][2]+ ' defence');
           if(this.bonusUses.armour>12) 
           {
+            props.notifier(bon[j][0]+' is too damaged. dropped')          
             this.stats.bonuses[j]-=1
             this.defence -= bon[j][2]
             //console.log('defence here ',this.defence )
             this.bonusUses.armour=0
-            this.stats.carrying-=1
+            return;
           }
           return;
         } 
@@ -162,17 +190,15 @@ export default class Hero {
       }
       //end defence armour
     }
-
-    this.gemBonus = function() 
-    {
-      
-    }
-
-    
+  
     //moving is called by getAll()
     this.moving = function(enemies,props)
     {
-    
+      // heal if 20 points lost
+      if(this.stats.maxHP>this.stats.hp) 
+      {
+        this.heal()
+      }
       if(this.stats.bonuses[11])
       {
       let mapX = this.map.getRow(this.y)
@@ -180,6 +206,7 @@ export default class Hero {
       this.map.makeTrail(mapX,mapY)
       }
       this.useHealthPots();
+      this.useGems();
 
     
 
@@ -208,31 +235,27 @@ export default class Hero {
           else if(fought.top)
           {
             // console.log('top')
-            this.move(0.016,0,-5)
+            this.move(newDelta,0,-2)
           }
           else if(fought.bottom)
           {
             // console.log('bottom')
-            this.move(0.016,0,5)
+            this.move(newDelta,0,2)
           }
-          //enemy xp/2 is your hit, it's high
+          //each hit is hardcoded 12
           //defence is currently between 2 and 14
           //xp is gained through attacks and improves attack
           
+          console.log(this.defence)
+          let enemyHit = 8 - this.defence
 
-          let enemyHit = fought.hitPoints/2 - (this.defence *2)
-
-          let hitCalculate = enemyHit<1?1:enemyHit
-          let xpGained = Math.cbrt(hitCalculate)
+          let hitCalculate = enemyHit<1?0:enemyHit
 
           //console.log('enemy hit :',fought.hitPoints,hitCalculate,'XP Gained: ',xpGained)
           this.stats.hp-=hitCalculate
 
-          this.stats.xp+=xpGained
           // console.log(this.stats.xp)
-        } else {
-           this.heal()
-        }
+        } 
       })
     }
 
@@ -262,12 +285,20 @@ export default class Hero {
               props.drawStats();
             }
             //only add to carrying if not full and not a backpack
-            if(this.stats.capacity>this.stats.carrying&&collision[0]!== 'backpack') {
+            if(this.stats.capacity>this.stats.carrying()&&collision[0]!== 'backpack') {
               // console.log('bonus: ',collision,props )
-              this.stats.carrying+=1
               this.stats.pickedBonuses+=1
+              // console.log(collision)
+              if(this.stats.bonuses[collision[2]])
+              {
+                this.stats.bonuses[collision[2]]+=1
+              }
+              else
+              {
+                this.stats.bonuses[collision[2]]=1
+              }
               props.notifier('picked up : '+bon);
-              props.notifier('you have '+this.stats.carrying+' of '+this.stats.capacity+' capacity');
+              props.notifier('you have '+this.stats.carrying()+' of '+this.stats.capacity+' capacity');
               props.updateMap(collision[1],2)
               props.drawStats();
              

@@ -9,7 +9,7 @@ export default function spaceOutRooms()
 	while(overlapped)
 	{
 		let count = d.length-1
-		if (tries>50) {
+		if (tries>150) {
 			break
 		};
 		overlapped = 0;

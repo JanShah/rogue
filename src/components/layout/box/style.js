@@ -8,6 +8,7 @@ let Box = styled.div`
     text-align:center;
      ${props=>props.detail[0]?'grid-area:'+props.detail[0]+';':null}
      ${props=>props.color?'color:'+props.color+';':null}
-`
+     ${props=>props.background?'background:'+props.background+';':null}
+     `
 export default Box
 

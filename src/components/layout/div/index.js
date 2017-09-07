@@ -17,7 +17,8 @@ function div(props) {
 		</SlideDiv>
 	else
 	return <Div 
-		bg={props.bg} 
+		bg={props.bg}
+		id={props.id} 
 		margin={props.margin} 
 		pad={props.pad} 
 		width={props.width}

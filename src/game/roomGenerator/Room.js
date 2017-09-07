@@ -1,4 +1,4 @@
-import near from './near'
+// import near from './near'
 
 export default class 
 {

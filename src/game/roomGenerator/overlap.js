@@ -1,5 +1,4 @@
 import moveRoom from './moveRoom'
-import rw from '../../general/functions/rw'
 
 export default function overlap(thisRoom,lastRoom) 
 {

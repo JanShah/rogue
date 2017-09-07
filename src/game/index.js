@@ -3,7 +3,6 @@ import Div from '../components/layout/div/'
 import Container from '../components/layout/container/'
 import Box from '../components/layout/box/'
 import Canvas from '../components/canvas/'
-// import Rooms from './roomGenerator/Rooms'
 import Board from '../gameBoard/'
 import Maps from '../gameBoard/Maps'
 import rw from '../general/functions/rw'
@@ -15,18 +14,11 @@ export default class extends Component
 	{
 		super(props)
 		let map = new Maps({...this.props,notifier:this.notifier})
-		console.log(map)
 		let detail = props.detail
 		let notes = detail.game?' Saved Map': ' Random Map'
 		this.state = {
 			map:map,
-			// grid:detail.grid,
-			// hero:detail.hero,
-			// started:detail.started,
-			// chanceEnemy:detail.enemies,
-			// chanceBonus:detail.bonuses,
 			loader:detail.loader,
-			// game:detail.game||new Rooms(props.detail),
 			notifications:['game loading'+notes]
 		}
 		this.notifier = this.notifier.bind(this)
@@ -34,16 +26,20 @@ export default class extends Component
 
 	notifier(note) 
 	{
-		let maxN = w<800?8:25
+		let maxN = w<800?8:20
 		let notes = this.state.notifications
-		notes.push(note)
-		if(notes.length>maxN) 
+		if(notes[notes.length-1]!==note)
 		{
-      notes.shift()
+			notes.push(note)
+	
+			if(notes.length>maxN) 
+			{
+				notes.shift()
+			}
+			this.setState({
+				notifications:notes
+			})
 		}
-		this.setState({
-			notifications:notes
-		})
 	}
 
 	showNotes() 
@@ -75,6 +71,7 @@ export default class extends Component
 		// console.log('send to game: ',this.props)
 		let canvas = document.getElementById('game')
 		if(canvas){		
+			canvas.style.marginTop='20px'
 			canvas.width = size.width<800?size.width-30:800
 			canvas.height = 600
 			let game = new Board({
@@ -86,7 +83,6 @@ export default class extends Component
 				hero:this.props.detail.hero
 			})
 			
-			// console.log(game)
 			if(!this.state.map.startingPoint)
 			{
 				alert('no rooms!')
@@ -99,11 +95,6 @@ export default class extends Component
 					game:game
 				})
 			}
-			// console.log('0',...map.layers[0])
-			// console.log('1',...map.layers[1])
-			// console.log('2',...map.layers[2])
-			// console.log('3',...map.layers[3])
-	
 		}
 	}
 
@@ -126,17 +117,12 @@ export default class extends Component
 
 	updateMap(cell,layer)
 	{
-		// console.log('updating: ',cell,layer)
-		// console.log(this.state.map.layers)
 		let map = Object.assign({},this.state.map)
-	//	console.log(this.state.map,cell,layer,this.state.map.layers[layer][cell])
-	map.layers[layer][cell]= rw(100,120)
-	map.layers[1][cell]= rw(100,120)
-	//map.layers[3][cell]= 40
-	this.setState({
+		map.layers[layer][cell]= rw(100,120)
+		map.layers[1][cell]= rw(100,120)
+		this.setState({
 			map:map
 		})
-		//console.log('updatemap function')
 	}
 
 
@@ -160,22 +146,32 @@ export default class extends Component
 	{
 		return <Container 
 			detail={['gameContainer']} 
-			cols={2} 
-			rows={3}
-			gap={20}
-			templateCols={'220px 1fr'} 
+			gap={0}
+			templateCols={'260px 800px repeat(3,1fr)'} 
+			templateRows={'603px 50px'} 
 			stretch={'flex-start'}>
 				<Box
 					key={1} 
 					color={'white'}
-					detail={['',1,3,1,1]}>
+					background={'#333'}
+					detail={['',1,1,1,1]}>
 					{this.showNotes()}
 				</Box>
 				<Box
-					key={2} 
-					detail={['',1,3,2,1]}>
-					<Canvas id='game' position={'relative'}/>
-				</Box>
+				key={2} 
+				detail={['',1,1,2,3]}>
+				<canvas id='game'/>
+				</Box>				
+				<Box
+					key={3} 
+					detail={['',1,2,3,1]}>
+					<canvas id='bonuses'/>
+					</Box>				
+					<Box
+					key={4} 
+					detail={['',2,1,2,1]}>
+					<canvas id='stats'/>
+					</Box>
 			</Container>
 	}
 	

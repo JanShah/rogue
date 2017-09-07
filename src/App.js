@@ -1,19 +1,87 @@
 import React, { Component } from 'react'
-import { injectGlobal } from 'styled-components';
 import { optionMinMax,presetData,boxGrid } from './constants/'
 import {players} from './constants/'
-import Button from './components/button/'
 import Div from './components/layout/div/'
-import Slider from './components/slider/'
-import Canvas from './components/canvas/'
 import Box from './components/layout/box/'
 import Container from './components/layout/container/'
-import Label from './components/label/'
 import Loader from './components/images/Loader'
 import characterAnims from './options/characterAnims'
 import Rooms from './game/roomGenerator/Rooms'
 import showGame from './game/demo/'
 import Game from './game/'
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import RaisedButton from 'material-ui/RaisedButton';
+import Slider from 'material-ui/Slider';
+
+const OptionSlider = (props) => {
+	let changeValue=(event,value)=>
+	{
+		props.onChange(props.what,event,value)
+	}
+
+ 	return <MuiThemeProvider>
+    <Slider 
+			min={props.what.min}
+      max={props.what.max}
+      step={props.step|1}
+      value={props.value}
+      onChange={changeValue.bind(this)} />
+	</MuiThemeProvider>
+};
+
+const Button = (props)=>(
+	<MuiThemeProvider>
+	<RaisedButton 
+		style={{borderRadius:'0',backgroundColor:'#fff'}}
+  	label={props.value}
+		onClick={props.onClick}
+		secondary={props.secondary}
+		fullWidth={true}
+		/>
+	</MuiThemeProvider>
+)
+
+class SliderGroup extends Component
+{
+	constructor()
+	{
+		super()
+		this.state={
+			visible:false
+		}
+	}
+	show(){
+		this.setState({
+			visible:!this.state.visible
+		})
+	}
+	render()
+	{
+		let style = {
+			display:!this.state.visible?'none':'block'
+		}
+		let outerStyle={
+			height:!this.state.visible?'0px':'94px',
+			transition:'all .3s ease-in-out'}
+		
+		return (
+		<div style={outerStyle}>
+			<Button 
+			onClick={this.show.bind(this)}
+			value={this.props.what.label+' '+this.props.optionValue}
+			/>
+			<div style={style}>
+				<OptionSlider 
+					value={this.props.optionValue}
+					what={this.props.what}
+					onChange={this.props.onChange.bind(this)}
+				/>
+			</div>			
+		</div>
+		)
+	}
+
+}
 
 class App extends Component {
 	constructor () {
@@ -21,6 +89,7 @@ class App extends Component {
 		let options = optionMinMax()
 		let width = window.innerWidth
 		let loader = new Loader()
+		loader.preload()
 		this.showSampleGrids = true;
 		this.state={
 			window: {
@@ -53,26 +122,28 @@ class App extends Component {
 	}
 
 	componentDidMount() {
-		injectGlobal`
-			body {
-				background:#666;
-				margin:0;
-				padding:0;    
-				font-family:'Cabin', sans-serif;
+		let inti = setInterval(()=>{
+			if(this.refs.loadedAsset.style.height==='0px')
+			{
+				console.log(this.refs.loadedAsset.style.height)
+				clearInterval(inti)
+				this.changeWindow()
 			}
-		`;
-		this.changeWindow()
+		},100)
 	}
 
 	getCSS() {
 		let width = window.innerWidth
 		let cols = width<500?1:width<800?2:width<1400?3:4
+		let visibleMenu = width<500?false:true
 		this.setState({
 			cols:cols,
 			window: {
 					width:width,
-					height:window.innerHeight
+					height:window.innerHeight,
+					visibleMenu:visibleMenu
 				}
+			
 		})
 	}
 
@@ -80,32 +151,33 @@ class App extends Component {
 		this.getCSS()
 	}
 
-	changeDefaults(value) {
-		if(value[0]==='height') {
+	changeDefaults(what,event,value) {
+		if(what.name==='height') {
 			this.setState({
 				size: {
-					h:value[1],
+					h:value,
 					w:this.state.size.w
 				}
 			})
-		} else	if(value[0]==='width') {
+		} 
+		else	if(what.name==='width') 
+		{
 			this.setState({
 				size: {
-					w:value[1],
+					w:value,
 					h:this.state.size.h
 				}
 			})
 		} 
-		else	if(value[0]==='grid') {
+		else	if(what.name==='grid') {
 			this.setState({
 				game:null
 			})
 		} 
 		this.setState({
-			[value[0]]: parseInt(value[1],10)
-			
+			[what.name]: value				
 		})
-		
+
 
 	}
 
@@ -142,15 +214,12 @@ class App extends Component {
 		let box=props
 		let p = box[0]
 		return (
-			<Box detail={box}>
-				<Label size='small' label={o[p].label}/>
-				<Label label={this.state[p]} />
-				<Slider 
-					val={this.state[p]}
-					what={o[p]}
-					alter={this.changeDefaults}
-				/>
-			</Box>
+			<SliderGroup 
+				buttonValue={this.state[p]}
+				optionValue={this.state[p]}
+				what={o[p]}
+				onChange={this.changeDefaults.bind(this)}
+			/>
 		)
 	}
 
@@ -168,34 +237,42 @@ class App extends Component {
 	} 
 
 	loadButton(data) {
-		return (!this.state.loader.getURL(data))
+		return (!this.state.loader.loaded)
 		? <Button 
-				primary={!this.state.started} 
-				text={'Load Players'} 
-				fn={this.changeWindow}
+				secondary={!this.state.started} 
+				value={'Load Players'} 
+				onClick={this.changeWindow}
 			/>
 		: <Button 
-				primary={this.state.started} 
-				text={this.state.sex==='f'?'choose Male Hero':'choose Female Hero'} 
-				fn={this.boyGirl}
+				secondary={this.state.started} 
+				value={this.state.sex==='f'?'choose Boy':'choose Girl'} 
+				onClick={this.boyGirl}
 			/>				
 	}
 
 	showSampleGrid(grid) {
-		showGame({sampleGrid:grid.dungeon.render,grid:this.state.grid,started:this.state.started})
+		showGame({
+			sampleGrid:grid.dungeon.render,
+			grid:this.state.grid,
+			started:this.state.started,
+			clicker:this.closeGame.bind(this)
+		})
 	}
 
 	componentDidUpdate() {
-		this.sampleGrid = new Rooms(this.state)
+		this.sampleGrid = this.state.game?this.state.game:new Rooms(this.state)
 		this.showSampleGrid(this.sampleGrid);
-	}
-
-	renderSample() {
 	}
 
 	saveMap(event) {
 		this.setState({
 			game:this.sampleGrid
+		})
+	}
+
+	clearMap() {
+		this.setState({
+			game:null
 		})
 	}
 
@@ -208,40 +285,79 @@ class App extends Component {
 		let bGrid = boxGrid();
 		let pCols = this.state.cols===1?1:this.state.cols
 		let pRows = this.state.cols===1?4:1
-		let alertText = this.state.game?'Map Saved. Changing dungeon width/height will delete your saved map':null
-		let saveButtontext = this.state.game?'Save this instead?':'Save this map'
 		
-		let retrieveSaved = this.state.game?<Button 
-							text={'load saved'} 
-							fn={this.showSampleGrid.bind(this,this.state.game)}/>:null
-		let saveButton = this.sampleGrid?<Button 
-							primary={this.state.started} 
-							text={saveButtontext}
-							fn={this.saveMap}
-						/>:null
+		let saveButton = (!this.state.game)
+		?<Button 
+			secondary={this.state.game} 
+			value={'Save this map'}
+			onClick={this.saveMap}/>
+			:<Button 
+			value={'clear saved'} 
+			onClick={this.clearMap.bind(this)}/>
+		let newButton =<Button 
+			secondary={!this.state.started} 
+			value={'get new map'}
+			onClick={this.clearMap.bind(this)}/>
+		
+		
+			
+		let menuStyle = {
+			listStyleType:'none',	
+			WebkitMarginStart:0,
+			WebkitMarginBefore:0,
+			WebkitPaddingStart:0,
+			marginTop: '0px',
+			paddingLeft: '0px'
+		}
+		let w = window.innerWidth<500?1:window.innerWidth<800?3:6
+		let wSmaller = window.innerWidth<500?1:window.innerWidth<800?2:5
+		let menuInnerStyle = {
+			display:'inline-block',
+			width:'calc(100%/'+w+')'	
+		}
+		let menuInnerSmallStyle = {
+			display:'inline-block',
+			width:'calc(100%/'+wSmaller+')'	
+		}
+
 		return ( 
 			<Div>
-				<Container detail={['container']} cols={this.state.cols===1?2:this.state.cols===2?4:9} rows={1}>
+				<div ref='loadedAsset' id='loader'></div>
+
+				<ul style = {menuStyle}>
 					{Object.keys(bGrid).map((box,key)=>
-						<Div key={key} pad={10}>
-							{box!=='player'?this.getBoxSlider(bGrid[box]):<Button 
-								primary={!this.state.started} 
-								text={p===4?'back to: '+presets[1].level:'use level preset: '+presets[p+1].level} 
-								fn={this.presets}
-						/>}
-						</Div> 
+						<li style={menuInnerStyle} key={key}>
+							{box!=='player'?this.getBoxSlider(bGrid[box])
+							:null}
+						</li> 
 					)}
-					<Div pad={10}>
+				</ul>
+				<ul style = {menuStyle}>
+					<li style={menuInnerSmallStyle} >
 						<Button 
-							primary={this.state.started} 
-							text={btnText} 
-							fn={this.closeGame}
+							secondary={!this.state.started} 
+							value={btnText} 
+							onClick={this.closeGame}
 						/>
-					</Div>
-					<Div pad={10}>
+					</li>					
+					<li style={menuInnerSmallStyle} >
 						{this.loadButton(playerlist.name[0])}
-					</Div>
-				</Container>
+					</li>
+
+					<li style={menuInnerSmallStyle} >
+						<Button 
+							secondary={!this.state.started} 
+							value={
+								p===4
+								?''+presets[1].level
+								:'lvl: '+presets[p+1].level
+							} 
+						onClick={this.presets}
+						/>
+					</li>
+					<li style={menuInnerSmallStyle} >{newButton}</li>		
+					<li style={menuInnerSmallStyle} >{saveButton}</li>
+					</ul>
 				<Container detail={['player']} cols={pCols===3?4:pCols} rows={pRows}>	
 					{
 						playerlist.name.map((player,id)=>{	
@@ -253,8 +369,8 @@ class App extends Component {
 									key={id} 
 									detail={[...detail,selector]}
 								>
-								<Canvas id={'pm_'+player} 
-									width={225}
+								<canvas id={'pm_'+player} 
+									width='225'
 									onClick={this.selectHero.bind(this)} 				
 								/>					
 								{
@@ -279,23 +395,8 @@ class App extends Component {
 						<Box
 							key={2} 
 							detail={['',1,1,1,2]}>
-						<Canvas id='gameDemo' />
+						<canvas id='gameDemo' />
 						</Box>
-						<Box
-							key={1} 
-							detail={['',2,1,1,2]}>
-							{alertText}
-						</Box>
-						<Box
-							key={3} 
-							detail={['',3,1,1,1]}>
-							{saveButton}
-						</Box>
-						<Box
-							key={4} 
-							detail={['',3,1,2,1]}>
-
-						{retrieveSaved}</Box>
 					</Container>
 				</Div>
 
@@ -305,17 +406,15 @@ class App extends Component {
 		
 	render() {
 		let btnText = this.state.started?' End ':'Start'
-		let text = this.state
-		// window.onresize=this.changeWindow
 		return !this.state.started
 			?	this.getContainer()
 			:	<Div>
 				<Button 
-					primary={!this.state.started} 
-					text={btnText} 
-					fn={this.closeGame}
+					secondary={!this.state.started} 
+					value={btnText} 
+					onClick={this.closeGame}
 				/>
-					<Game detail = {this.state}/>
+					<Game detail={this.state}/>
 				</Div>
 	}
 }

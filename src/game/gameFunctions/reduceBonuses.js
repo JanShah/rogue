@@ -9,15 +9,14 @@ export default function reduceBonuses(props)
   if(this.bonusTimer<0) 
   {
     props.notifier('a map bonus has depleted')
-    this.bonusTimer=600
+    this.bonusTimer=100
     //reduce one bonus at a time, whichever found first from last to first
     for(let i = 12;i>=9;i--)
     {
       if(stats[i])
       { 
-        this.bonusTimer = bonusNames[i][4] //get the timer value of the last bonus
+        this.bonusTimer = bonusNames()[i][4] //get the timer value of the last bonus
         this.hero.stats.bonuses[i]-=1; 
-        this.hero.stats.carrying-=1
         this.drawStats() 
         return;
       }

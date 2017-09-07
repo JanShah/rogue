@@ -1,5 +1,5 @@
 import rw from '../../general/functions/rw'
-import near from './near'
+import near from '../../general/functions/near'
 
 export default function () 
 {
@@ -34,7 +34,7 @@ export default function ()
 	}
 	let addRooms = room=>
 	{
-		let colorSpot = 	spot.floor
+		// let colorSpot = 	spot.floor
 		let tl = room.tl
 		let br = room.br
 		for(let y = tl.y;y<=br.y;y++)
@@ -47,7 +47,7 @@ export default function ()
 	}
 	let addStartingPoint = room =>
 	{
-		console.log(room)
+		// console.log(room)
 		returnGrid[room.point] = spot.start
 		d.startingPoint = room.centrePoint
 	}
@@ -65,7 +65,7 @@ export default function ()
 		let y = room.centrePoint.y
 		let nearest=100000
 		let bestRoom;
-		d.map(point =>{
+		d.forEach(point =>{
 			let nearX = Math.abs(point.centrePoint.x-x)
 			let nearY = Math.abs(point.centrePoint.y-y)
 			let nearRoom = near({x:nearX,y:nearY})

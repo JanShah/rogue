@@ -3,7 +3,7 @@ export default function trimRooms()
 {
 	let dungeon = this
 	let mark =[]
-	dungeon.map((a,b)=>{
+	dungeon.forEach((a,b)=>{
 		if (a.br.y>=dungeon.grid-2||a.tl.y<=2||a.br.x>=dungeon.grid-2||a.tl.x<=2)
 		{
 			mark.push(b)

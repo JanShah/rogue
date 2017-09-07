@@ -3,13 +3,13 @@ import Rooms from '../game/roomGenerator/Rooms'
 import rw from '../general/functions/rw'
 class BonusLayer {
   constructor(props) {
-    this.cells = props.map(cell=>{
+    let odds = 100-props[1]
+    this.cells = props[0].map(cell=>{
       let newCell
       if(cell>=100&&cell<=120)
       {
-        if(rw(0,100)>90)
+        if(rw(0,100)>odds)
         {
-          // console.log('valid cell')
           newCell = rw(6,39)
         }
         else
@@ -28,8 +28,8 @@ class BonusLayer {
 
 class Enemies {
   constructor(props) {
-    let odds = 90
-    this.cells = JSON.parse(JSON.stringify(props))
+    let odds = 100-props[1]
+    this.cells = JSON.parse(JSON.stringify(props[0]))
     .map((a,b)=>{
       return (a>=100&&a<=120)?
       rw(0,100)>odds?rw(41,48):0
@@ -52,14 +52,15 @@ export default class Maps {
       game = props.detail.game
     }
 
-    console.log(game.dungeon.startingPoint)
+    // console.log(props)
+    let dt = props.detail
     this.tsize=64
     this.bsize=23
     this.startingPoint = game.dungeon.startingPoint
     let floorLayer = new Layer({grid:this.cols,no:1})
     let rooms = game.dungeon.render
-    let bonuses = new BonusLayer(rooms).cells
-    let enemies = new Enemies(bonuses).cells
+    let bonuses = new BonusLayer([rooms,dt.bonuses]).cells
+    let enemies = new Enemies([bonuses,dt.enemies]).cells
     
     this.layers=[floorLayer, rooms, bonuses, enemies]
     this.getTile=(index,col,row)=>{return this.layers[index][row * this.cols + col]}

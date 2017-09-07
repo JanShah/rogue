@@ -25,7 +25,7 @@ import drawFloor from '../game/gameFunctions/drawFloor'
 
 export default class {
   constructor(props) {
-    console.log('game props',props)
+    // console.log('game props',props)
     this.enemies=[]
     this.menuPaths=[]
     this.loader= props.loader
@@ -34,7 +34,7 @@ export default class {
     this.tick = tick.bind(this)
     this.run=run.bind(this)
     //initial sprite rotation
-    this.rotations = [0,141]
+    this.rotations = [0,72]
     // this.getXP=getXP.bind(this)
     this.getAll=getAll.bind(this)
     this.drawEnemies=drawEnemies.bind(this,props)

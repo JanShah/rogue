@@ -1,4 +1,3 @@
-// import Stats from './Stats'
 import rw from '../../../general/functions/rw'
 import positions from '../positions'
 import getHP from '../getHP'
@@ -19,42 +18,86 @@ export default class Enemy {
     {
       this.mover[1] = -1
     }
-    this.changeDirection=rw(50,250)
+    this.changeDirection=rw(100,250)
     this.map= props.map
     this.hp = rw(this.heroMax-50,this.heroMax)
     this.id=props.id
     this.x= props.x
     this.y = props.y
+    this.rotations=[0,0]
     this.frameWidth=96
     this.frameHeight=188
     this.width= 32
     this.height= 47
     this.xp = rw(20,90)
     this.image=props.loader.getImage('enemies'+props.ref)
-    this.SPEED=rw(150,300)
+    this.SPEED=rw(150,200)
+    this.skip = 7 //skip frames to slow down walking animation
     this.positions = positions.bind(this)
+    this.visibility = 150
     this.healthWarning = ()=>this.hp<30
-
     //this fight is called by the hero.
+
+    this.whichDirection=directions=>{
+      let a = directions[0]
+      let b = directions[1]
+      let xdif = Math.floor(a[0]-b[0])
+      let ydif = Math.floor(a[1]-b[1])
+      if(ydif>26&&ydif<42)
+      {
+        return [0.01,0,-1] //above
+      }
+      if(ydif>-42&&ydif<-26)
+      {
+        return [0.01,0,1] //below
+      }
+      if(xdif>-42&&xdif<-26)
+      {
+        return [0.01,1,0]  //right
+      }
+        
+      if(xdif>26&&xdif<42)
+      {
+        return [0.01,-1,0]  //left
+      }  
+    }
+
+
+    this.seeHero = (heroPos)=>{
+      let one = Math.abs(heroPos[0]-this.x)
+      let two = Math.abs(heroPos[1]-this.y)
+      if(one<this.visibility&&two<this.visibility)
+      {
+        // console.log('seen on XY')
+        let x = heroPos[0]>this.x?1:-1
+        x = one>10?x:0
+        let y = x?0:heroPos[1]>this.y?1:-1
+        this.mover=[0.01,x,y]
+      }
+        // console.log(heroPos,this.x,this.y)
+
+    }
+
+
     this.fight = function (hero) 
     {
-      xpBar(this.getHP({hp:this.hp,x:this.screenX,y:this.screenY}))
+
+      xpBar(this.getHP({hp:this.hp,x:this.screenX+30,y:this.screenY+25}))
       this.move(...this.mover)
       let p  = this.positions()
-
       // console.log(p,hero)
-      let rt = p.top<=hero.bottom //hit from top
-      let rb = p.bottom>=hero.top //hit from bottom
-      let rl = p.right>=hero.left //from right
-      let rr = p.left<=hero.right //from left
+      let rt = p.top<hero.bottom // from top
+      let rb = p.bottom>hero.top //hit from bottom
+      let rl = p.right>hero.left //from right
+      let rr = p.left<hero.right //from left
       // console.log(p,rt,rb,rl,rr)
-      let rules = 
-      rt&&
-      rb&&
-      rl&&
-      rr
 
-      // console.log(rl,rt,rr,rb)
+      if(!this.healthWarning()) 
+      {
+        this.seeHero(hero.xy)
+      }
+
+      let rules = rt&&rb&&rl&&rr
       if(rules) 
       {
         let hits = 
@@ -65,52 +108,19 @@ export default class Enemy {
           bottom:p.bottom,
           xy:[this.x,this.y]
         }
-        if(this.x<hero.xy[0]&&(hero.xy[1]-20<this.y&&hero.xy[1]+20>this.y)) 
+        let movement = this.whichDirection([[this.x,this.y],hero.xy])
+        if(movement)
         {
-          console.log('enemy is left',this.healthWarning())
-          this.move(newDelta,-10,0) //bounce off
-          if(this.healthWarning())
-          {
-            this.mover=[newDelta,-3,0] //run away
-          }
-          else 
-          {
-            this.mover=[newDelta,3,0] //run towards
-          }        
-        }
-        else if(this.x>hero.xy[0]&&(hero.xy[1]-20<this.y&&hero.xy[1]+20>this.y)) 
-        {
-          console.log('enemy is Right')
-          this.move(newDelta,20,0)
-          if(this.healthWarning())
-          {
-            console.log('running away')
-            this.mover=[newDelta,3,0] //run away
-           }
-          else 
-          {
-            console.log('moving left')
-            this.mover=[newDelta,3,0] //run away
-
+          if(!this.healthWarning()) {
+            this.mover=movement
+          } else {
+            this.mover=[0.01,-movement[1],-movement[2]]
           }
         }
-        
-        if(rr) 
-        {
-          this.move(newDelta,-2,0)
-          if(this.healthWarning())
-          {
-            this.mover=[newDelta,-1,0] 
-          }
-          else 
-          {
-            this.mover=[newDelta,1,0]
-          }
-        }
+        // this.whichDirection([[this.x,this.y],hero.xy])
         let hitPoints = Math.floor(Math.floor(hero.xp/2))
-        console.log('enemy took hit: '+ hitPoints)
+        // console.log('enemy took hit: '+ hitPoints)
         this.hp-=hitPoints
-        this.heroMax+=Math.floor(hitPoints/2)
 
         return {hit:rules,...hits,xp:this.xp,hitPoints:Math.floor(hitPoints)}
       } 
@@ -132,7 +142,7 @@ export default class Enemy {
           {
             this.mover[1] = 2
           }
-          this.changeDirection=rw(20,200)
+          this.changeDirection=rw(200,250)
         }
         var row, col;
         let p  = this.positions()
@@ -152,14 +162,25 @@ export default class Enemy {
           } 
           else 
           {
-            if(lb&&lt) //left
-              this.mover=[0.01,1,0] //move right
-            if(lt&&rt) //top
-              this.mover=[0.01,0,1] //move down
-            if(rb&&lb) //bottom
-              this.mover=[0.01,0,-1]
-            if(rb&&rt)
-              this.mover=[0.01,-1,0]
+            if(lb&&lt){
+              
+              this.mover=[newDelta,1,0] //move right
+            } //left
+            if(lt&&rt) {
+              // this.rotations=[64,94]
+              this.mover=[newDelta,0,1] //move down
+
+            } //top
+            if(rb&&lb){
+              // this.rotations=[96,0]
+              
+              this.mover=[newDelta,0,-1]
+            }
+              //bottom
+            if(rb&&rt) {
+              this.mover=[newDelta,-1,0]
+
+            }
 
 
           }
@@ -187,7 +208,41 @@ export default class Enemy {
     };
     this.move=(delta,dirX,dirY)=> 
     {
+     
       newDelta = delta
+      this.skip-=1
+      if(dirX>0)
+      {
+        this.rotations[1]=94
+        //moving down
+        // console.log(dirX)
+      }
+      else if(dirX<0)
+      {
+        this.rotations[1]=47
+      }
+      else if(dirY>0)
+      {
+        this.rotations[1]=0        
+      }
+      else if(dirY<0)
+      {
+        this.rotations[1]=141
+        
+      }
+      
+      if(this.skip<=0)
+      {
+        this.rotations[0]+=32
+        this.skip=7
+      }
+
+      if(this.rotations[0]>=96)
+      {
+        this.rotations[0]=0
+      }
+
+
       this.x+= dirX * this.SPEED * delta
       this.y+= dirY * this.SPEED * delta
       this.collide(dirX,dirY)

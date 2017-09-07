@@ -1,6 +1,5 @@
 import Room from './Room'
 import Point from './Point'
-import Size from './Size'
 
 
 export default function moveRoom(room,move) 

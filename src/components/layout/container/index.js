@@ -12,6 +12,7 @@ function container(props) {
     stretch={props.stretch}
     template={props.template}
     templateCols={props.templateCols}
+    templateRows={props.templateRows}
     >{props.children}</Container>
 }
 

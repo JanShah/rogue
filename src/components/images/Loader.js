@@ -56,15 +56,44 @@ export default class Loader {
           reject('not loaded '+src)
         }
       })
+
       img.src=src
       return d;
     }
 
-    Object.keys(images).forEach(image=>{
-      let imageUrl  = images[image];
-      loadImage(image,imageUrl)
-    })
+    this.preload=()=>{
+      let no = 0
+      let len = Object.keys(images).length
+      return Object.keys(images).forEach((image,index)=>{
+      new Promise((resolve,reject)=>{
+        let loadedImage = loadImage(image,images[image])
+          resolve(loadedImage)
+          reject(err=>console.error(err))
+        }).then(()=>{
+          no+=1
+          let loaderDom = document.getElementById('loader')
+          let perc = Math.round(no/len*10000)/100
+          loaderDom.style.color='white'
+          loaderDom.style.position='relative'
+          loaderDom.style.width=perc+'%'
+          loaderDom.style.transition='all .3s ease-in'
+          loaderDom.style.height='18px'
+          loaderDom.style.background=`hsla(${perc-30},80%,50%,1)`
+          loaderDom.innerHTML = 'loading assets '+perc+'%'
+          if(perc===100)
+          {
+            setTimeout(()=>{
 
+              loaderDom.style.background=`hsla(${perc},100%,50%,0)`
+              loaderDom.style.visibility='hidden'
+              loaderDom.style.height='0px'
+            },1000)
+            this.loaded = true
+          }
+          return true
+        })
+      })
+    }
     this.getURL = image => {
       return  this.sourceFile[image];
     }

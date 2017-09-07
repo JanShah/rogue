@@ -16,7 +16,7 @@ export default function drawEnemies(props)
 
     this.ctx.drawImage(
       a.image,
-      0, 0, 
+      ...a.rotations, 
       a.width,a.height, 
       a.x-this.camera.x-a.width/2,a.y-this.camera.y-a.height/2, 
       a.width, a.height)
@@ -30,5 +30,7 @@ export default function drawEnemies(props)
   {
     props.notifier('Vanquished an Enemy')
     this.enemies.splice(markedforDeletion-1,1)
+    this.hero.stats.killed+=1
+    this.hero.stats.xp+=1
   }
 }
