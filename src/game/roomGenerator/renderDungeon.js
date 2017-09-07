@@ -64,7 +64,7 @@ export default function ()
 		let x = room.centrePoint.x
 		let y = room.centrePoint.y
 		let nearest=100000
-		let bestRoom;
+		let bestRoom
 		d.forEach(point =>{
 			let nearX = Math.abs(point.centrePoint.x-x)
 			let nearY = Math.abs(point.centrePoint.y-y)
@@ -77,9 +77,9 @@ export default function ()
 			if(!bestRoom)
 			{
 				let item = d.filter(a=>{
-					return a.point<2000&&a.point>1000
+					return a.point<40000
 				})
-				bestRoom = item[0] || d[0]
+				bestRoom = item[item.length-1] 
 			}		
 		})	
 		room.nearest(bestRoom)
@@ -144,8 +144,7 @@ export default function ()
 	{
 		let size = d.grid
 		// console.log(...grid)
-		grid.forEach((a,b)=>
-		{
+		let addWalls=(a,b)=>{
 			let n = {
 				a:b-size,
 				b:b+size,
@@ -158,21 +157,19 @@ export default function ()
 			grid[b] = spot.wall
 			// console.log('n:',n,rule,a)
 			}
+			let cornerRule = b+size+1
+			if(grid[cornerRule]&&!grid[b])
+			{
+				grid[b] = spot.wall				
+			}			
+		}
+		grid.forEach((a,b)=>
+		{
+			addWalls(a,b)
 		})
 		grid.reverse().forEach((a,b)=>
 		{
-			let n = {
-				a:b-size,
-				b:b+size,
-				l:b-1,
-				r:b+1
-			}
-			let rule = (grid[n.b]||grid[n.r])
-			if(!grid[b]&&rule&&b)
-			{
-			grid[b] = spot.wall
-			// console.log('n:',n,rule,a)
-			}
+			addWalls(a,b)
 		})
 		grid.reverse()
 	}
