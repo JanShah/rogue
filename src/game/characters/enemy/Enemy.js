@@ -7,18 +7,23 @@ let newDelta;
 export default class Enemy {
   constructor(props) 
   {
-    
+    this.doMove =()=>{
+      let validMoves = [
+        [0,-1],
+        [0,1],
+        [1,0],
+        [-1,0],
+        [0,0]
+      ]
+      return validMoves[rw(0,4)]
+    }
     this.heroMax = 90
     this.getHP = getHP.bind(this)
-    this.moveY = ()=>rw(-1,1)
-    this.moveX = ()=>this.moveY===0?1:0
-    this.mover = [0.01,this.moveX(),this.moveY()]
 
-    if(!this.mover[1]&&!this.mover[2]) 
-    {
-      this.mover[1] = -1
-    }
-    this.changeDirection=rw(100,250)
+    let move = this.doMove()
+    this.seenHero = false
+    this.mover = [0.01,...move]
+    this.changeDirection=rw(60,250)
     this.map= props.map
     this.hp = rw(this.heroMax-50,this.heroMax)
     this.id=props.id
@@ -29,12 +34,13 @@ export default class Enemy {
     this.frameHeight=188
     this.width= 32
     this.height= 47
-    this.xp = rw(20,90)
+    // this.xp = rw(20,90)
     this.image=props.loader.getImage('enemies'+props.ref)
-    this.SPEED=rw(150,200)
+    this.SPEED=rw(250,300)
     this.skip = 7 //skip frames to slow down walking animation
     this.positions = positions.bind(this)
-    this.visibility = 150
+    this.visibility = rw(150,200)
+    this.stuck=false
     this.healthWarning = ()=>this.hp<30
     //this fight is called by the hero.
 
@@ -68,11 +74,16 @@ export default class Enemy {
       let two = Math.abs(heroPos[1]-this.y)
       if(one<this.visibility&&two<this.visibility)
       {
+        this.seenHero=true
         // console.log('seen on XY')
         let x = heroPos[0]>this.x?1:-1
         x = one>10?x:0
         let y = x?0:heroPos[1]>this.y?1:-1
         this.mover=[0.01,x,y]
+      }
+      else
+      {
+        this.seenHero = false
       }
         // console.log(heroPos,this.x,this.y)
 
@@ -92,9 +103,13 @@ export default class Enemy {
       let rr = p.left<hero.right //from left
       // console.log(p,rt,rb,rl,rr)
 
-      if(!this.healthWarning()) 
+      if(!this.healthWarning()&&!this.stuck) 
       {
         this.seeHero(hero.xy)
+      }
+      else
+      {
+        this.seenHero = false;
       }
 
       let rules = rt&&rb&&rl&&rr
@@ -114,15 +129,16 @@ export default class Enemy {
           if(!this.healthWarning()) {
             this.mover=movement
           } else {
-            this.mover=[0.01,-movement[1],-movement[2]]
+            let move = this.doMove()
+            this.mover=[0.01,...move]
           }
         }
         // this.whichDirection([[this.x,this.y],hero.xy])
-        let hitPoints = Math.floor(Math.floor(hero.xp/2))
+        let hitPoints = rw(hero.xp/4,hero.xp/2)
         // console.log('enemy took hit: '+ hitPoints)
-        this.hp-=hitPoints
+        this.hp-=rw(hero.xp/2,hero.xp)
 
-        return {hit:rules,...hits,xp:this.xp,hitPoints:Math.floor(hitPoints)}
+        return {hit:rules,...hits,hitPoints:Math.ceil(hitPoints)}
       } 
       else 
       {
@@ -134,15 +150,10 @@ export default class Enemy {
         this.changeDirection-=1
         if(!this.changeDirection) 
         {
-          let moveX = this.moveX()
-          let moveY =this.moveY()
-          this.mover=[newDelta,moveX,moveY]
-          
-          if(!this.mover[1]&&!this.mover[2]) 
-          {
-            this.mover[1] = 2
-          }
-          this.changeDirection=rw(200,250)
+          this.stuck = false          
+
+          this.mover=[newDelta,...this.doMove()]
+          this.changeDirection=rw(100,250)
         }
         var row, col;
         let p  = this.positions()
@@ -152,39 +163,20 @@ export default class Enemy {
         let lb = this.map.whatTile(p.left, p.bottom)
 
         var collision = lt||rt||rb||lb
-        
           if (
-          !collision||
-          collision[0]=== 'bonus'||
-          collision[0]=== 'backpack') 
+            !collision||
+            collision[0]=== 'bonus'||
+            collision[0]=== 'backpack') 
           { 
             return; 
           } 
           else 
           {
-            if(lb&&lt){
-              
-              this.mover=[newDelta,1,0] //move right
-            } //left
-            if(lt&&rt) {
-              // this.rotations=[64,94]
-              this.mover=[newDelta,0,1] //move down
-
-            } //top
-            if(rb&&lb){
-              // this.rotations=[96,0]
-              
-              this.mover=[newDelta,0,-1]
-            }
-              //bottom
-            if(rb&&rt) {
-              this.mover=[newDelta,-1,0]
-
-            }
-
-
+            this.stuck = true
+            let move = this.doMove()
+            this.mover=[newDelta,...move]
+            this.changeDirection= 20                
           }
-
         if (diry > 0) 
         {
             row = this.map.getRow(p.bottom);
@@ -231,7 +223,7 @@ export default class Enemy {
         
       }
       
-      if(this.skip<=0)
+      if(this.skip<=0&&(dirY!==0||dirX!==0))
       {
         this.rotations[0]+=32
         this.skip=7

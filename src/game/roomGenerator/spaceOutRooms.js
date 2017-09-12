@@ -9,14 +9,15 @@ export default function spaceOutRooms()
 	while(overlapped)
 	{
 		let count = d.length-1
-		if (tries>150) {
+		if (tries>30) {
+			
 			break
 		};
 		overlapped = 0;
 		while(count)
 		{
 			// console.log(tries)
-			for(let room = 0;room<d.length;room++)
+			for(let room = d.length-1;room>=0;room--)
 			{
 				if(room!==count)
 				{
@@ -31,7 +32,16 @@ export default function spaceOutRooms()
 					dr.tl.y-overlap<=dc.br.y   
 					if(rule) {
 						overlapped = 1;
-						d[room] = this.overlap(d[room],d[count])
+						if(tries>20)
+						{
+							// delete d[room]
+							d.splice(room,1)
+							break
+						}
+						else 
+						{
+							d[room] = this.overlap(d[room],d[count])							
+						}
 					}
 				}
 			}

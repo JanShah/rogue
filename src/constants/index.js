@@ -55,12 +55,12 @@ export const presetData=()=>{
 	return {
 		1:{
 			level:'easy',
-			grid:70,
-			enemies: 5,
-			bonuses: 30,
-			width:8,
-			height:8,
-			rooms:6,
+			grid:60,
+			enemies: 6,
+			bonuses: 29,
+			width:12,
+			height:12,
+			rooms:8,
 			hero:'ninja_m',
 			preset:1
 		},
@@ -89,7 +89,7 @@ export const presetData=()=>{
 		4: {
 			level:'unfair',
 			grid:150,
-			enemies: 35,
+			enemies: 25,
 			bonuses: 5,
 			width:25,
 			height:20,
@@ -109,14 +109,14 @@ export const optionMinMax=()=>{
 			name:'grid',
 			label:'Dungeon Size'},
 		enemies:{
-			min:5,
+			min:1,
 			max:30,
 			default:8,
 			name:'enemies',
 			label:'% enemies'},
 		bonuses:{
 			min:1,
-			max:15,
+			max:30,
 			default:8,
 			name:'bonuses',
 			label:'% bonuses'},
@@ -134,7 +134,7 @@ export const optionMinMax=()=>{
 			label:'Room max Height'},
 		rooms:{
 			min:3,
-			max:50,
+			max:200,
 			default:10,
 			name:'rooms',
 			label:'Max Rooms'}
@@ -152,7 +152,13 @@ export const grid =()=>{
 
 export const players=sex=>{
 	return {
-		name:['mage_'+sex,'healer_'+sex,'ninja_'+sex,'ranger_'+sex]
+		name:['mage_'+sex,'healer_'+sex,'ninja_'+sex,'ranger_'+sex],
+		startingBonus: {
+			mage:'soemthing for mage',
+			healer:'something for healer',
+			ninja:'something for ninja',
+			ranger:'something for ranger'
+		}
 	}
 
 }

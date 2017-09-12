@@ -17,6 +17,7 @@ import enemies46 from '../../assets/enemies/_enemy_46.png'
 import enemies47 from '../../assets/enemies/_enemy_47.png'
 import enemies48 from '../../assets/enemies/_enemy_48.png'
 import floor from '../../assets/floor.png'
+import dpad from '../../assets/dpad.png'
 
 let images = {
   tiles: tilesquares,
@@ -37,7 +38,8 @@ let images = {
   enemies47: enemies47,
   enemies48: enemies48,
   screen: screen,
-  floor:floor
+  floor:floor,
+  dpad:dpad
 }
 
 export default class Loader {
@@ -77,7 +79,7 @@ export default class Loader {
           loaderDom.style.position='relative'
           loaderDom.style.width=perc+'%'
           loaderDom.style.transition='all .3s ease-in'
-          loaderDom.style.height='18px'
+          loaderDom.style.height='10vh'
           loaderDom.style.background=`hsla(${perc-30},80%,50%,1)`
           loaderDom.innerHTML = 'loading assets '+perc+'%'
           if(perc===100)

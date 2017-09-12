@@ -11,7 +11,7 @@ export default function overlap(thisRoom,lastRoom)
 	let move
 	if(tc.x>=lc.x) 
 	{
-		move = {x:tc.x+3,y:tc.y}
+		move = {x:tc.x+1,y:tc.y}
 	}
 	else if(tc.x<lc.x) 
 	{
@@ -19,7 +19,7 @@ export default function overlap(thisRoom,lastRoom)
 	}
 	if(tc.y>=lc.y) 
 	{
-		move = {x:tc.x,y:tc.y+3}
+		move = {x:tc.x,y:tc.y+1}
 	} 
 	else if(tc.y<lc.y) 
 	{

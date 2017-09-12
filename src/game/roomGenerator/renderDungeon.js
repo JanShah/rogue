@@ -27,7 +27,7 @@ export default function ()
 		corridor:2,
 		altWall:5,
 		red:6,
-		centre:8,
+		centre:800,
 		test:9,
 		start:999,
 		exit:200
@@ -181,7 +181,7 @@ export default function ()
 
 	if(d.length>1)
 	{
-		let createExitRoom=rw(2,d.length-1)
+		let createExitRoom=rw(1,d.length-1)
 		for(let room = 0;room<d.length;room++)
 		{
 			getNearestSpot(d[room])
@@ -194,11 +194,13 @@ export default function ()
 		for(let room = 0;room<d.length;room++)
 		{
 			addRooms(d[room])
+			// console.log('adding rooms',createExitRoom,room)
 			if(room===createExitRoom)
 			{
+				// console.log('adding exit')
 				addExitPoint(d[room])
 			}
-			if(room===0)
+			else if(room===0)
 			{
 				addStartingPoint(d[room])
 			}

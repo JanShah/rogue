@@ -1,10 +1,12 @@
 import Keyboard from  '../../gameFunctions/Keyboard'
+// import TouchEvents from  '../../gameFunctions/TouchEvents'
 
 export default function heroMove(delta)
 {
   // handle hero movement with arrow keys
   let dirx = 0;
   let diry = 0;
+  // TouchEvents()
   if (Keyboard.isDown(Keyboard.LEFT)||Keyboard.isDown(Keyboard.LEFT1)) {
     dirx = -1;
     //animatesprite.. it's tuned to the hero sprite

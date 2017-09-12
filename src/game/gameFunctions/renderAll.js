@@ -12,9 +12,12 @@ export default function renderAll(sprite)
   this.drawLayer(3)
   //draw the enemies as they spawn
   this.drawEnemies()
+
+  // this.drawDpad()
   //draw mini map
-  // this.miniCanvas()
   // draw main character
+  this.getCircle()
   this.drawSprite(sprite)
+  this.miniCanvas()
   //shadow surrounding the player
 }

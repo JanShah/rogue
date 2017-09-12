@@ -3,14 +3,17 @@ import { bonusNames } from '../../../constants/'
 import positions from '../positions'
 import getHP from '../getHP'
 import xpBar from '../xpBar'
+import bonusTotal from '../../gameFunctions/bonusTotal'
 let newDelta
 
 
 export default class Hero {
   constructor(props) 
   {
+    this.coinsNeeded = Math.ceil(props.map.roomcount/2)
     let startPoint = props.map.startingPoint
     this.stats=new Stats()
+    this.seenByEnemy = false
     this.map= props.map
     this.x= startPoint.x*props.map.tsize
     this.y = startPoint.y*props.map.tsize
@@ -19,16 +22,16 @@ export default class Hero {
     this.width= 32
     this.height= 36
     this.visibility=200
-    this.defence=0;
+    this.defence=0
+    this.attack=0
     this.image=props.loader.getImage(props.hero)
     this.SPEED=256
     this.positions = positions.bind(this)
-    let timer=200;
+    let timer=200
     this.heal=()=>{
       timer--
       if(!timer)
       {
-        console.log('healing')
         this.stats.hp+=1
         timer=200          
       }
@@ -43,13 +46,30 @@ export default class Hero {
     this.bonusUses={
       defPotion:0,
       shield:0,
-      armour:0
+      armour:0,
+      weapon:0
     }
     this.hitCounter = 0
-    this.weaponBonus=function()
-    {
-      //console.log(this.stats.weapons)
-      
+
+    this.weaponBonus=function(use)
+    { 
+      let weapon = bonusTotal(this.stats.bonuses)[4]
+      if(weapon&&use)
+      {
+        props.notifier(weapon[0]+' added '+weapon[1]+' damage')
+        this.bonusUses.weapon+=1
+        if(this.bonusUses.weapon>6)
+        {
+          props.notifier(weapon[0]+' destroyed ')
+          this.stats.bonuses[weapon[3]]-=1
+          this.bonusUses.weapon = 0
+        }
+
+      }
+      else
+      {
+        return weapon?weapon[1]:0
+      }
     }
 
     this.useHealthPots = function()
@@ -95,105 +115,118 @@ export default class Hero {
     }
 
 
-    this.defenceBonus = function() 
+    this.defencePotion = function() 
     {
-      //console.log('called for defence Bonus',this.defence)
       const bon = bonusNames()
-
-      //defence pots
       if(this.stats.bonuses[27]) 
       {
-        props.notifier('Potion  :'+bon[27][0]+' for '+bon[27][4]+ ' defence');
-        console.log(this.bonusUses)
-        this.bonusUses.defPotion+=1
-        this.counts.potions=true
-        if(!this.bonusUses.defPotion)
+        props.notifier('Potion: '+bon[27][0]+' for '+bon[27][4]+ ' defence');
+        if(!this.bonusUses[27])
         {
-          this.defence += bon[27][4]
-          //console.log('adding potion',this.defence)
+          this.bonusUses[27] = 1
         }
-        if(this.bonusUses.defPotion>5) 
+        else
         {
-          props.notifier(bon[27][0]+'emptied. Dropped')          
+          this.bonusUses[27] += 1
+        }
+        if(this.bonusUses[27]>5)
+        {
+          delete this.bonusUses[27]
           this.stats.bonuses[27]-=1
-          this.defence -= bon[27][4]
-          this.bonusUses.defPotion=0;
+          props.notifier(bon[27][0]+' emptied. Dropped')        
 
-          //console.log('removing potion',this.defence)
-          
-          
         }
-      } else 
-      {
-        this.counts.potions = false;
+        return bon[27][4]
       }
-      //end defence potions
-
-      for(let i = 25; i>=22;i--) 
+      else
       {
-        // console.log('called for shields')
-        if(this.stats.bonuses[i]) 
-        {
-          this.counts.shield=true
-          if(!this.bonusUses.shield)
-          {
-            this.defence += bon[i][2]
-          }
-          this.bonusUses.shield+=1
-          props.notifier('shield:'+bon[i][0]+'  '+bon[i][2]+ ' def. uses: ' +this.bonusUses.shield+'/10');
-          if(this.bonusUses.shield>=10) 
-          {
-            props.notifier(bon[i][0]+ ' depleted. Dropped');
-            this.defence -= bon[i][2]
-            this.stats.bonuses[i]-=1
-            this.bonusUses.shield=0
-            return;
-          }
-          return //break the loop
-        } 
-        else 
-        {
-          this.counts.shield=false
-        }
+        return 0
       }
-      //end defence shields
-
-      for(let j = 32; j>=29;j--) 
-      {
-        //console.log('called for armour')
-        if(this.stats.bonuses[j]) 
-        {
-          this.counts.armour=true
-          if(!this.bonusUses.armour)
-          {
-            // console.log(bon)
-            this.defence += bon[j][2]
-          }
-          this.bonusUses.armour+=1
-          props.notifier('armour  :'+bon[j][0]+' for '+bon[j][2]+ ' defence');
-          if(this.bonusUses.armour>12) 
-          {
-            props.notifier(bon[j][0]+' is too damaged. dropped')          
-            this.stats.bonuses[j]-=1
-            this.defence -= bon[j][2]
-            //console.log('defence here ',this.defence )
-            this.bonusUses.armour=0
-            return;
-          }
-          return;
-        } 
-        else 
-        {
-          this.counts.armour=false
-        }
-        
-      }
-      //end defence armour
     }
-  
+    this.defenceShields = function() 
+    {
+      const bon = bonusNames()
+      let bestShield = 0
+      let returnShield = 0
+      for(let shield = 25; shield>=22;shield--)
+      {
+        if(this.stats.bonuses[shield]) 
+        {
+          // console.log('got a shield--------------------------')
+          if(bon[shield][4]>bestShield)
+          {
+            bestShield = bon[shield][4]
+            returnShield = shield
+          }
+        }
+      }
+      if(returnShield)
+      {
+      props.notifier('Shield: '+bon[returnShield][0]+' for '+bon[returnShield][4]+ ' defence');
+        
+        // console.log('bestShield: ',bestShield,returnShield )
+        if(!this.bonusUses[returnShield])
+        {
+          this.bonusUses[returnShield]  = 1           
+        }
+        this.bonusUses[returnShield]+=1
+        if(this.bonusUses[returnShield]>5)
+        {
+          delete this.bonusUses[returnShield]
+          this.stats.bonuses[returnShield]-=1
+          props.notifier(bon[returnShield][0]+' damaged, dropped');
+        }
+        return bestShield
+      }
+      else 
+      {
+        return 0
+      }
+    }
+    this.defenceArmour = function() 
+    {
+      const bon = bonusNames()
+      let bestArmour = 0
+      let returnArmour = 0
+      for(let armour = 32; armour>=29;armour--)
+      {
+        if(this.stats.bonuses[armour]) 
+        {
+          // console.log('got armour--------------------------')
+          if(bon[armour][4]>bestArmour)
+          {
+            bestArmour = bon[armour][4]
+            returnArmour = armour
+          }
+        }
+      }
+      if(returnArmour)
+      {
+      props.notifier('Shield: '+bon[returnArmour][0]+' for '+bon[returnArmour][4]+ ' defence');
+        
+        // console.log('bestShield: ',bestShield,returnArmour )
+        if(!this.bonusUses[returnArmour])
+        {
+          this.bonusUses[returnArmour]  = 1           
+        }
+        this.bonusUses[returnArmour]+=1
+        if(this.bonusUses[returnArmour]>5)
+        {
+          delete this.bonusUses[returnArmour]
+          this.stats.bonuses[returnArmour]-=1
+          props.notifier(bon[returnArmour][0]+' damaged, dropped');
+        }
+        return bestArmour
+      }
+      else 
+      {
+        return 0
+      }
+    }
     //moving is called by getAll()
     this.moving = function(enemies,props)
     {
+
       // heal if 20 points lost
       if(this.stats.maxHP>this.stats.hp) 
       {
@@ -207,18 +240,20 @@ export default class Hero {
       }
       this.useHealthPots();
       this.useGems();
-
-    
-
+      enemies.some(enemy=>{
+        this.seenByEnemy = enemy.seenHero
+        return enemy.seenHero
+      })
       enemies.forEach(enemy=>{
         xpBar(getHP({maxHP:this.stats.maxHP,hp:this.stats.hp,x:this.screenX,y:this.screenY}))
 
-        let fought = enemy.fight({...this.positions(),xp:this.stats.xp,xy:[this.x,this.y]})
+        let totalFight = this.stats.xp + this.weaponBonus();
+        let fought = enemy.fight({...this.positions(),xp:totalFight,xy:[this.x,this.y]})
         if(fought.hit)
         {
-          // this.weaponBonus()
-          this.defenceBonus();
+          this.defence = this.defencePotion() + this.defenceShields() + this.defenceArmour()
           this.hitCounter+=1
+          this.weaponBonus(true)
           // console.log('my x y : ',
           // this.x,this.y,
           // 'enemy:' ,fought.xy)
@@ -242,18 +277,12 @@ export default class Hero {
             // console.log('bottom')
             this.move(newDelta,0,2)
           }
-          //each hit is hardcoded 12
-          //defence is currently between 2 and 14
-          //xp is gained through attacks and improves attack
-          
-          console.log(this.defence)
-          let enemyHit = 8 - this.defence
+          //each enemy hit is randomly between quarter and half of hero xp.
+          //xp is gained through kills and red gems and improves attack
+          let enemyHit = Math.max(fought.hitPoints-this.defence,0)
+          // console.log('defence: ',this.defence,'damage done: ',enemyHit)
 
-          let hitCalculate = enemyHit<1?0:enemyHit
-
-          //console.log('enemy hit :',fought.hitPoints,hitCalculate,'XP Gained: ',xpGained)
-          this.stats.hp-=hitCalculate
-
+          this.stats.hp-=enemyHit
           // console.log(this.stats.xp)
         } 
       })
@@ -281,6 +310,7 @@ export default class Hero {
               this.stats.capacity+=10;
               props.notifier('capacity increased to '+this.stats.capacity);
               props.updateMap(collision[1],2)
+              this.stats.bonuses[collision[2]]+=1
               this.stats.pickedBonuses+=1
               props.drawStats();
             }

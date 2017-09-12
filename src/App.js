@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { optionMinMax,presetData,boxGrid } from './constants/'
 import {players} from './constants/'
-import Div from './components/layout/div/'
 import Box from './components/layout/box/'
 import Container from './components/layout/container/'
 import Loader from './components/images/Loader'
@@ -58,7 +57,8 @@ class SliderGroup extends Component
 	render()
 	{
 		let style = {
-			display:!this.state.visible?'none':'block'
+			display:!this.state.visible?'none':'block',
+			margin:'10px'
 		}
 		let outerStyle={
 			height:!this.state.visible?'0px':'94px',
@@ -125,7 +125,6 @@ class App extends Component {
 		let inti = setInterval(()=>{
 			if(this.refs.loadedAsset.style.height==='0px')
 			{
-				console.log(this.refs.loadedAsset.style.height)
 				clearInterval(inti)
 				this.changeWindow()
 			}
@@ -138,6 +137,7 @@ class App extends Component {
 		let visibleMenu = width<500?false:true
 		this.setState({
 			cols:cols,
+			assetsLoaded:true,
 			window: {
 					width:width,
 					height:window.innerHeight,
@@ -230,7 +230,7 @@ class App extends Component {
 		if(this.state.hero!==newHero){
 			canvas = document.getElementById('pm_'+this.state.hero)
 		}
-		if(canvas) canvas.style.background='#666'
+		if(canvas) canvas.style.background='rgba(0,0,0,0)'
 		this.setState({
 			hero: newHero
 		})
@@ -298,8 +298,6 @@ class App extends Component {
 			secondary={!this.state.started} 
 			value={'get new map'}
 			onClick={this.clearMap.bind(this)}/>
-		
-		
 			
 		let menuStyle = {
 			listStyleType:'none',	
@@ -319,45 +317,45 @@ class App extends Component {
 			display:'inline-block',
 			width:'calc(100%/'+wSmaller+')'	
 		}
+		let menuButtons = this.state.assetsLoaded?<div><ul style = {menuStyle}>
+		{Object.keys(bGrid).map((box,key)=>
+			<li style={menuInnerStyle} key={key}>
+				{box!=='player'?this.getBoxSlider(bGrid[box])
+				:null}
+			</li> 
+		)}
+	</ul>
+	<ul style = {menuStyle}>
+		<li style={menuInnerSmallStyle} >
+			<Button 
+				secondary={!this.state.started} 
+				value={btnText} 
+				onClick={this.closeGame}
+			/>
+		</li>					
+		<li style={menuInnerSmallStyle} >
+			{this.loadButton(playerlist.name[0])}
+		</li>
 
+		<li style={menuInnerSmallStyle} >
+			<Button 
+				secondary={!this.state.started} 
+				value={
+					p===4
+					?'return to: '+presets[1].level
+					:'Preset level: '+presets[p+1].level
+				} 
+			onClick={this.presets}
+			/>
+		</li>
+		<li style={menuInnerSmallStyle} >{newButton}</li>		
+		<li style={menuInnerSmallStyle} >{saveButton}</li>
+		</ul></div>:null
 		return ( 
-			<Div>
+			<div>
 				<div ref='loadedAsset' id='loader'></div>
-
-				<ul style = {menuStyle}>
-					{Object.keys(bGrid).map((box,key)=>
-						<li style={menuInnerStyle} key={key}>
-							{box!=='player'?this.getBoxSlider(bGrid[box])
-							:null}
-						</li> 
-					)}
-				</ul>
-				<ul style = {menuStyle}>
-					<li style={menuInnerSmallStyle} >
-						<Button 
-							secondary={!this.state.started} 
-							value={btnText} 
-							onClick={this.closeGame}
-						/>
-					</li>					
-					<li style={menuInnerSmallStyle} >
-						{this.loadButton(playerlist.name[0])}
-					</li>
-
-					<li style={menuInnerSmallStyle} >
-						<Button 
-							secondary={!this.state.started} 
-							value={
-								p===4
-								?''+presets[1].level
-								:'lvl: '+presets[p+1].level
-							} 
-						onClick={this.presets}
-						/>
-					</li>
-					<li style={menuInnerSmallStyle} >{newButton}</li>		
-					<li style={menuInnerSmallStyle} >{saveButton}</li>
-					</ul>
+				{menuButtons}
+				
 				<Container detail={['player']} cols={pCols===3?4:pCols} rows={pRows}>	
 					{
 						playerlist.name.map((player,id)=>{	
@@ -373,24 +371,18 @@ class App extends Component {
 									width='225'
 									onClick={this.selectHero.bind(this)} 				
 								/>					
-								{
-									this.state.loader.getURL(player)
-									?	(
-										characterAnims(
+								{characterAnims(
 											{	
 												loader:this.state.loader,
 												hero:player,
 												selected:this.state.hero
-											})
-										)
-									:null
-								}
+											})}
 								</Box>
 							)
 						})
 					}
 				</Container>
-				<Div align='center'>
+				<div style={{align:'center'}}>
 					<Container detail={['grids']} cols={2} template={'1fr 27px 20px'} stretch={'center'}>	
 						<Box
 							key={2} 
@@ -398,24 +390,26 @@ class App extends Component {
 						<canvas id='gameDemo' />
 						</Box>
 					</Container>
-				</Div>
+				</div>
 
-			</Div>
+			</div>
 		)
 	}
 		
 	render() {
 		let btnText = this.state.started?' End ':'Start'
+		let floor = this.state.loader.getURL('floor')
+		document.body.style.background=this.state.started?'#333':'url('+floor+')'
 		return !this.state.started
 			?	this.getContainer()
-			:	<Div>
+			:	<div>
 				<Button 
 					secondary={!this.state.started} 
 					value={btnText} 
 					onClick={this.closeGame}
 				/>
 					<Game detail={this.state}/>
-				</Div>
+				</div>
 	}
 }
 

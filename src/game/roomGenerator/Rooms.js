@@ -32,7 +32,7 @@ function makeRoomCoords(props)
 	spaceOut();
 	//trim the excess
 	trimmer()
-	//grid to 1d array
+	//add corridors and convert grid to 1d array
 	renderGrid()
 
 	return dungeon

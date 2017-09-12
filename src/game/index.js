@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
-import Div from '../components/layout/div/'
 import Container from '../components/layout/container/'
 import Box from '../components/layout/box/'
-import Canvas from '../components/canvas/'
 import Board from '../gameBoard/'
 import Maps from '../gameBoard/Maps'
 import rw from '../general/functions/rw'
@@ -19,19 +17,28 @@ export default class extends Component
 		this.state = {
 			map:map,
 			loader:detail.loader,
-			notifications:['game loading'+notes]
+			notifications:['game loading '+notes]
 		}
 		this.notifier = this.notifier.bind(this)
 	}
 
 	notifier(note) 
 	{
-		let maxN = w<800?8:20
-		let notes = this.state.notifications
+		let maxN = w<800?8:15
+		let notes = Object.assign([],this.state.notifications)
 		if(notes[notes.length-1]!==note)
 		{
-			notes.push(note)
-	
+			//if notes are similar, change the note, don't append
+			let lastMessage = notes[notes.length-1]
+			let newMessage = note.split(':')[0]
+			if(lastMessage.match(newMessage))
+			{
+				notes[notes.length-1]=note
+			}
+			else
+			{
+				notes.push(note)				
+			}
 			if(notes.length>maxN) 
 			{
 				notes.shift()
@@ -45,14 +52,17 @@ export default class extends Component
 	showNotes() 
 	{
     if(this.state.notifications.length) {
+			let style = {
+				margin:'3px 0 5px 10px',
+				align:'left',
+				textAlign:'left'
+			}
 			let notes = this.state.notifications
 			.map((note,num)=>
-				<Div 
-					margin={'3px 0 5px 10px'}
-					align={'left'} 
+				<div style={style}
 					key={num}>
 					{note}
-				</Div>
+				</div>
 			)
       return notes
     }
@@ -68,7 +78,6 @@ export default class extends Component
 		let size = this.props.detail.window
 
 		let loader = this.props.detail.loader
-		// console.log('send to game: ',this.props)
 		let canvas = document.getElementById('game')
 		if(canvas){		
 			canvas.style.marginTop='20px'
@@ -79,6 +88,7 @@ export default class extends Component
 				canvas:canvas,
 				loader:loader,
 				updateMap:this.updateMap.bind(this),
+				miniMap:this.miniMap.bind(this),
 				notifier:this.notifier.bind(this),
 				hero:this.props.detail.hero
 			})
@@ -111,7 +121,7 @@ export default class extends Component
 		let hp = this.state.game.hero.stats.hp
 		if(hp<1)
 		{
-			this.state.game.endGame()					
+			this.state.game.endGame('lost')					
 		}
 	}
 
@@ -125,20 +135,35 @@ export default class extends Component
 		})
 	}
 
+	miniMap() {
+    if(this.state.game.hero.stats.bonuses[9])
+    this.setState({
+      miniMap:true
+    })
+  }
+
+
+
 
 	smallWindow() 
 	{
 		return <Container 
 			detail={['gameContainer']} 
-			cols={1} 
+			cols={2} 
 			rows={1}
 			gap={20}
 			templateCols={'1fr'} 
 			stretch={'stretch'}><Box
 				key={1} 
-				detail={['',1,3,1,2]}>
-				<Canvas id='game' position={'relative'}/>
+				detail={['',1,1,1,1]}>
+				<canvas id='game' />
 			</Box>
+			<Box
+				key={4} 
+				detail={['',2,1,1,1]}>
+				<canvas id='stats'/>
+			</Box>
+			
 			</Container>
 	}
 
@@ -157,6 +182,13 @@ export default class extends Component
 					detail={['',1,1,1,1]}>
 					{this.showNotes()}
 				</Box>
+				<Box
+					key={5} 
+					color={'white'}
+					background={'#333'}
+					detail={['',2,1,1,1]}>
+					<canvas id='miniMap'/>
+					</Box>
 				<Box
 				key={2} 
 				detail={['',1,1,2,3]}>
@@ -177,7 +209,6 @@ export default class extends Component
 	
 	render() 
 	{
-		// console.log(this.state)
 		return this.props.detail.window.width<800?this.smallWindow():this.largeWindow()
 	}
 

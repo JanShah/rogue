@@ -10,18 +10,26 @@ class BonusLayer {
       {
         if(rw(0,100)>odds)
         {
-          newCell = rw(6,39)
+          newCell = rw(6,40)
         }
         else
         {
           newCell = cell
         } 
       }
-      else 
+      else if(cell===800)
       {
-        newCell = cell
+        newCell = 13 //add the obligatory coin to the centre of each room
       }
-      return newCell
+      else if(cell===0) 
+        {
+          newCell = 4      
+        }
+      else
+      {
+        newCell = cell        
+      }
+        return newCell
     })
   }
 }
@@ -52,20 +60,21 @@ export default class Maps {
       game = props.detail.game
     }
 
-    // console.log(props)
     let dt = props.detail
     this.tsize=64
     this.bsize=23
+
     this.startingPoint = game.dungeon.startingPoint
-    let floorLayer = new Layer({grid:this.cols,no:1})
+    let floorLayer = new Layer({grid:this.cols,no:3})
     let rooms = game.dungeon.render
+    console.log(game)
     let bonuses = new BonusLayer([rooms,dt.bonuses]).cells
     let enemies = new Enemies([bonuses,dt.enemies]).cells
-    
+    this.roomcount = game.dungeon.length
     this.layers=[floorLayer, rooms, bonuses, enemies]
     this.getTile=(index,col,row)=>{return this.layers[index][row * this.cols + col]}
 
-    this.makeTrail = (x,y)=>{ this.layers[0][x * this.cols + y] = 2}
+    this.makeTrail = (x,y)=>{ this.layers[2][x * this.cols + y] = 39}
     this.whatTile=(x,y)=>{
       let col = Math.floor(x / this.tsize);
       let row = Math.floor(y / this.tsize);
@@ -73,7 +82,7 @@ export default class Maps {
         let tile = this.getTile(index, col, row);
         let thisTile = false;
         //wall tiles
-        if(tile >2 && tile <6) thisTile=true;
+        if(tile ===5) thisTile=true;
         //bonus tiles
         if(tile>5&&tile<39&&tile!==14) thisTile = ['bonus',[(row*this.cols)+col],tile]
         //backpack

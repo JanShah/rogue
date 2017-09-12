@@ -27,15 +27,15 @@ export default function showGame(room) {
 				}
 				ctx.fillRect(x,y,1,1)
 			})
-			ctx.fillStyle='grey'
-			ctx.fillRect(0,0,canvas.width,7)
+			// ctx.fillStyle='grey'
+			// ctx.fillRect(0,0,canvas.width,7)
 	
 		}
 		canvas.style.cursor='pointer'
 		canvas.style.boxShadow='none'
 		canvas.style.transition='all 0.1s'
 		canvas.addEventListener('mouseover',()=>{
-			ctx.fillStyle='#fff'
+			ctx.fillStyle='rgba(255,255,255,0.7)'
 			ctx.font='bold 5px Arial'
 			ctx.fillText('click Start to play',2,5,100)
 			canvas.style.boxShadow='1px 1px 1px 1px rgba(0,0,0,0.5)'
@@ -64,12 +64,13 @@ export default function showGame(room) {
 		{
 			0:'#444',
 			1:'skyblue',
-			2:'white',
+			2:'skyblue',
 			3:'#7a3f7b',
 			4:'#7f8472',
-			5:'grey',
+			5:'#2b2525',
 			6:'red',
 			8:'yellow',
+			9:'#2b2525',
 			40:'grey',
 			101:'#00bcd4',
 			999:'green',

@@ -21,7 +21,8 @@ import whatIsBonus from '../game/gameFunctions/whatIsBonus'
 import seeBonus from '../game/gameFunctions/seeBonus'
 import drawBonus from '../game/gameFunctions/drawBonus'
 import drawFloor from '../game/gameFunctions/drawFloor'
-
+import getCircle from '../game/gameFunctions/getCircle'
+// import drawDpad from '../game/gameFunctions/drawDpad'
 
 export default class {
   constructor(props) {
@@ -29,13 +30,13 @@ export default class {
     this.enemies=[]
     this.menuPaths=[]
     this.loader= props.loader
-  //   this.load = load
+    // this.drawDpad = drawDpad.bind(this)
+  
     this.init = initialize.bind(this,props)
     this.tick = tick.bind(this)
     this.run=run.bind(this)
     //initial sprite rotation
     this.rotations = [0,72]
-    // this.getXP=getXP.bind(this)
     this.getAll=getAll.bind(this)
     this.drawEnemies=drawEnemies.bind(this,props)
     this.drawFloor=drawFloor.bind(this,props)
@@ -56,8 +57,9 @@ export default class {
     this.statNumbers=statNumbers.bind(this)
     this.drawSprite=drawSprite.bind(this)
     this.visibility=visibility.bind(this)
+    this.getCircle = getCircle.bind(this)
     this.veil = veil.bind(this)
-    // this.miniCanvas=miniCanvas.bind(this,props)
+    this.miniCanvas=miniCanvas.bind(this,props)
     this.drawBonus= drawBonus.bind(this,props)
     let nap = {
       rows:props.map.rows,

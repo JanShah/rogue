@@ -7,7 +7,7 @@ export default function drawStats()
   if(canvas)
   {
 
-    canvas.height=631
+    canvas.height=640
     canvas.style.marginTop='1px'
     let ctx =canvas.getContext('2d');
     //event listener for bonus info
@@ -28,7 +28,6 @@ export default function drawStats()
     let bonuses = this.hero.stats.bonuses
     let bonusKeys = Object.keys(bonuses)
     let gap = 17
-    ctx.fillRect(0,0,320,750)
     ctx.drawImage(this.screenMenu,x,50)
     ctx.font='1em Arial'
     ctx.fillStyle='#fff'
@@ -48,7 +47,7 @@ export default function drawStats()
             this.drawBonus(2,a,x+48*(a-6),90,ctx)
             this.statNumbers({ctx:ctx, bonus:a, pos: a-5, arca:140, x:x, bPos:a-5, bY:146})
            break;
-          //coins  (wealth)
+          //coins  (only way out)
           case '13':
             this.drawBonus(2,a,x+48*(a-10),90,ctx)
             this.statNumbers({ctx:ctx, bonus:a, pos: a-9, arca:140, x:x, bPos:a-9, bY:146})
