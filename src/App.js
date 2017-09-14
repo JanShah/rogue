@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { optionMinMax,presetData,boxGrid } from './constants/'
-import {players} from './constants/'
+import {players,instructions} from './constants/'
 import Box from './components/layout/box/'
 import Container from './components/layout/container/'
 import Loader from './components/images/Loader'
@@ -11,6 +11,53 @@ import Game from './game/'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
 import Slider from 'material-ui/Slider';
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
+
+class Modal extends Component {
+  state = {
+    open: false,
+  };
+
+  handleOpen = () => {
+    this.setState({open: true});
+  };
+
+  handleClose = () => {
+    this.setState({open: false});
+  };
+
+  render() {
+    const actions = [
+      <FlatButton
+        label="Ok"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose}
+      />,
+    ];
+
+
+    return (
+      <MuiThemeProvider>
+				<div>
+        <RaisedButton label="Instructions" onClick={this.handleOpen} fullWidth={true}/>
+        <Dialog
+          title="How to Play"
+          actions={actions}
+          modal={false}
+          open={this.state.open}
+          onRequestClose={this.handleClose}
+          autoScrollBodyContent={true}
+        >
+				{instructions()}
+        </Dialog>
+				</div>
+			</MuiThemeProvider>
+    );
+  }
+}
+
 
 const OptionSlider = (props) => {
 	let changeValue=(event,value)=>
@@ -40,22 +87,19 @@ const Button = (props)=>(
 	</MuiThemeProvider>
 )
 
-class SliderGroup extends Component
-{
-	constructor()
-	{
+class SliderGroup extends Component {
+	constructor() {
 		super()
 		this.state={
 			visible:false
 		}
 	}
-	show(){
+	show() {
 		this.setState({
 			visible:!this.state.visible
 		})
 	}
-	render()
-	{
+	render() {
 		let style = {
 			display:!this.state.visible?'none':'block',
 			margin:'10px'
@@ -262,6 +306,9 @@ class App extends Component {
 	componentDidUpdate() {
 		this.sampleGrid = this.state.game?this.state.game:new Rooms(this.state)
 		this.showSampleGrid(this.sampleGrid);
+		let playerlist = players(this.state.sex)
+		playerlist.name.map(player=>this.animate(player))
+
 	}
 
 	saveMap(event) {
@@ -276,7 +323,13 @@ class App extends Component {
 		})
 	}
 
-
+	animate(player) {
+		characterAnims({	
+			loader:this.state.loader,
+			hero:player,
+			selected:this.state.hero
+		})
+	}
 	getContainer() {
 		let playerlist = players(this.state.sex)
 		let presets = presetData()
@@ -317,40 +370,48 @@ class App extends Component {
 			display:'inline-block',
 			width:'calc(100%/'+wSmaller+')'	
 		}
-		let menuButtons = this.state.assetsLoaded?<div><ul style = {menuStyle}>
-		{Object.keys(bGrid).map((box,key)=>
-			<li style={menuInnerStyle} key={key}>
-				{box!=='player'?this.getBoxSlider(bGrid[box])
-				:null}
+		let menuButtons = this.state.assetsLoaded
+		?<div>
+		<ul style = {menuStyle}>
+			<li style={menuInnerStyle} >
+				<Button 
+					secondary={!this.state.started} 
+					value={btnText} 
+					onClick={this.closeGame}
+				/>
+			</li>					
+			<li style={menuInnerStyle} >
+				<Modal />	
+				</li>					
+			<li style={menuInnerStyle} >
+				{this.loadButton(playerlist.name[0])}
+			</li>
+			<li style={menuInnerStyle} >
+				<Button 
+					secondary={!this.state.started} 
+					value={
+						p===4
+						?'Return to '+presets[1].level
+						:'Try '+presets[p+1].level + ' Level'
+					} 
+				onClick={this.presets}
+				/>
+			</li>
+			<li style={menuInnerStyle} >{newButton}</li>		
+			<li style={menuInnerStyle} >{saveButton}</li>
+			</ul>
+			<ul style = {menuStyle}>
+				{Object.keys(bGrid).map((box,key)=>
+					<li style={menuInnerStyle} key={key}>
+					{box!=='player'
+						?this.getBoxSlider(bGrid[box])
+						:null
+					}
 			</li> 
 		)}
-	</ul>
-	<ul style = {menuStyle}>
-		<li style={menuInnerSmallStyle} >
-			<Button 
-				secondary={!this.state.started} 
-				value={btnText} 
-				onClick={this.closeGame}
-			/>
-		</li>					
-		<li style={menuInnerSmallStyle} >
-			{this.loadButton(playerlist.name[0])}
-		</li>
-
-		<li style={menuInnerSmallStyle} >
-			<Button 
-				secondary={!this.state.started} 
-				value={
-					p===4
-					?'Return to '+presets[1].level
-					:'Try '+presets[p+1].level + ' Level'
-				} 
-			onClick={this.presets}
-			/>
-		</li>
-		<li style={menuInnerSmallStyle} >{newButton}</li>		
-		<li style={menuInnerSmallStyle} >{saveButton}</li>
-		</ul></div>:null
+		</ul>		
+		</div>
+		:null
 		return ( 
 			<div>
 				<div ref='loadedAsset' id='loader'></div>
@@ -371,12 +432,7 @@ class App extends Component {
 									width='225'
 									onClick={this.selectHero.bind(this)} 				
 								/>					
-								{characterAnims(
-											{	
-												loader:this.state.loader,
-												hero:player,
-												selected:this.state.hero
-											})}
+								{this.animate(player)}
 								</Box>
 							)
 						})

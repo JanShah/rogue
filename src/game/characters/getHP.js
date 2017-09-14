@@ -19,7 +19,7 @@ export default function getHP(who)
 				xp:who.xp?'xp: '+who.xp:'', 
 				coords:[
 					who.x-20.5,
-					who.y-37
+					who.y-36
 				]
 	}
 

@@ -1,3 +1,4 @@
+import React, { Component } from 'react'
 export const boxGrid=()=>{
 	return {
 		grid: ['grid',0,0,0,0,'white'],
@@ -47,6 +48,34 @@ export const bonusNames = () =>{
     37: ['RTB Axe'		,'Refined Twin Blade Axe'		,4,'another stronger twin bladed axe',12],
     38: ['L3 TB Axe'	,'Level 3 Twin Blade Axe'		,4,'the pinnacle of axe technology',14]
     }
+}
+
+export const instructions=()=>{
+	return <div>
+		<p>
+			Use Up, Down, Left, Right  or W,A,S,D keys to move.  
+		</p>
+		<p>
+			Collect the coins to open the exit and find the now open exit to win. simples :)
+		</p>
+		<p>
+			To start, press the start button on the top menu.  
+			You can also adjust the dungeon by clicking on any one of the buttons in the second row and adjusting the slider accordingly. 
+			Feel free to experiment :)
+		</p>
+		<p>
+			in game, you will be presented with various bonuses, collect these to power up, gain hp and xp. 
+			</p>
+		<p>
+			Your hero will always use the most powerful bonuses to hand when fighting, simply walk towards your enemy to fight
+		</p>
+		<p>
+			Map bonuses are time limited, other bonuses are limited in use apart from the backpack and coins
+		</p>
+		<p>
+			You will need to collect a certain number of coins to open the exit, the tally is in the bottom left of your game screen
+		</p>
+		</div>
 }
 export const startBonus=hero=>{
 	// console.log('hero',hero)

@@ -37,7 +37,7 @@ export default function showGame(room) {
 		canvas.addEventListener('mouseover',()=>{
 			ctx.fillStyle='rgba(255,255,255,0.7)'
 			ctx.font='bold 5px Arial'
-			ctx.fillText('click Start to play',2,5,100)
+			ctx.fillText('click Start button to play',2,5,100)
 			canvas.style.boxShadow='1px 1px 1px 1px rgba(0,0,0,0.5)'
 		})
 
