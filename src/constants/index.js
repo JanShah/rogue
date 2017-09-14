@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 export const boxGrid=()=>{
 	return {
 		grid: ['grid',0,0,0,0,'white'],
