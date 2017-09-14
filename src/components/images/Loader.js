@@ -17,9 +17,18 @@ import enemies46 from '../../assets/enemies/_enemy_46.png'
 import enemies47 from '../../assets/enemies/_enemy_47.png'
 import enemies48 from '../../assets/enemies/_enemy_48.png'
 import floor from '../../assets/floor.png'
-import dpad from '../../assets/dpad.png'
+// import dpad from '../../assets/dpad.png'
+import exit from '../../assets/exit.png'
 
 let images = {
+  enemies41: enemies41,
+  enemies42: enemies42,
+  enemies43: enemies43,
+  enemies44: enemies44,
+  enemies45: enemies45,
+  enemies46: enemies46,
+  enemies47: enemies47,
+  enemies48: enemies48,
   tiles: tilesquares,
   mage_m: mage_m,
   ninja_m: ninja_m,
@@ -29,17 +38,10 @@ let images = {
   ninja_f: ninja_f,
   ranger_f: ranger_f,
   healer_f: healer_f,
-  enemies41: enemies41,
-  enemies42: enemies42,
-  enemies43: enemies43,
-  enemies44: enemies44,
-  enemies45: enemies45,
-  enemies46: enemies46,
-  enemies47: enemies47,
-  enemies48: enemies48,
   screen: screen,
   floor:floor,
-  dpad:dpad
+  // dpad:dpad,
+  exit:exit
 }
 
 export default class Loader {
@@ -81,7 +83,7 @@ export default class Loader {
           loaderDom.style.transition='all .3s ease-in'
           loaderDom.style.height='10vh'
           loaderDom.style.background=`hsla(${perc-30},80%,50%,1)`
-          loaderDom.innerHTML = 'loading assets '+perc+'%'
+          loaderDom.innerHTML = 'loading assets '+image+' '+perc+'%'
           if(perc===100)
           {
             setTimeout(()=>{

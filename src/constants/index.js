@@ -1,5 +1,3 @@
-export const game=()=>'something'
-
 export const boxGrid=()=>{
 	return {
 		grid: ['grid',0,0,0,0,'white'],
@@ -15,85 +13,95 @@ export const boxGrid=()=>{
 export const bonusNames = () =>{
 	return {
 				//shortname//name //type //description //value
-    6 : ['B Gem'			,'Blue Gem'									,1,'increase max health',10],
-    7 : ['G Gem'			,'Green Gem'								,1,'restore some HP',20],
-    8 : ['R Gem'			,'Red Gem'									,1,'increase XP',5],
-    9 : ['Scroll'			,'Scroll'										,2,'view Mini Map. Time limited',600],
-    10: ['Letter'			,'Letter'										,2,'Increased Visibility Range. Time ',900],
-    11: ['Map'				,'Map'											,2,'Make a trail of your travelled route.',900],
-    12: ['Tome'				,'Tome'											,2,'increases knowledge, map bonuses last longer',1200],
+    6 : ['B Gem'			,'Blue Gem'									,1,'increase max health',20],
+    7 : ['G Gem'			,'Green Gem'								,1,'restore some HP',30],
+    8 : ['R Gem'			,'Red Gem'									,1,'increase XP',10],
+    9 : ['Scroll'			,'Scroll'										,2,'view Mini Map. Time limited',900],
+    10: ['Letter'			,'Letter'										,2,'Increased Visibility Range. Time ',1100],
+    11: ['Map'				,'Map'											,2,'Make a trail of your travelled route.',600],
+    12: ['Tome'				,'Tome'											,2,'Map bonuses last longer',1000],
     13: ['Coin'				,'Coin'											,3,'Pay your passage out of the dungeon',1],
     14: ['Backpack'		,'Backpack'									,7,'each increases storage capacity by 10',10],
-    15: ['"Dagger'		,'Dagger'										,4,'small bladed weapon',3],
-    16: ['"G" Dagger'	,'Golden Dagger'						,4,'finer quality than the small bladed weapon',5],
-    17: ['"W" Sword'	,'Wooden Sword'							,4,'basic attack weapon',3],
-    18: ['"M" Sword'	,'Metal Sword'							,4,'tougher materials make this more durable',8],
-    19: ['"A" Sword'	,'Alloy Sword'							,4,'the finest craftsmanship',10],
-    20: ['Hammer'			,'Hammer'										,4,'what, it\'s just a hammer..',3],
-    21: ['R Hammer'		,'Reinforced Hammer'				,4,'reinforced for extra strength',6],
-    22: ['S Shield'		,'Small Shield'							,5,'small, relatively feeble defense',2],
-    23: ['RS Shield'	,'Reinforced Small Shield'	,5,'a better shield, still too small for some..',5],
-    24: ['L Shield'		,'large Shield'							,5,'offers more protection against attack',6],
-    25: ['RL Shield'	,'Reinforced Large Shield'	,5,'high defensive capabilities',8],
-    26: ['H Pot'			,'Health Potion(blue)'			,6,'will restore your health when needed.',35],
+    15: ['"Dagger'		,'Dagger'										,4,'small bladed weapon',5],
+    16: ['"G" Dagger'	,'Golden Dagger'						,4,'finer quality than the small bladed weapon',7],
+    17: ['"W" Sword'	,'Wooden Sword'							,4,'basic attack weapon',4],
+    18: ['"M" Sword'	,'Metal Sword'							,4,'tougher materials make this more durable',9],
+    19: ['"A" Sword'	,'Alloy Sword'							,4,'the finest craftsmanship',11],
+    20: ['Hammer'			,'Hammer'										,4,'just a hammer, will knock a nail..',2],
+    21: ['R Hammer'		,'Reinforced Hammer'				,4,'reinforced for extra strength',7],
+    22: ['S Shield'		,'Small Shield'							,5,'small, relatively feeble defense',4],
+    23: ['RS Shield'	,'Reinforced Small Shield'	,5,'a better shield, still too small for some..',6],
+    24: ['L Shield'		,'large Shield'							,5,'offers more protection against attack',9],
+    25: ['RL Shield'	,'Reinforced Large Shield'	,5,'high defensive capabilities',11],
+    26: ['H Pot'			,'Health Potion(blue)'			,6,'will restore your health when needed.',45],
     27: ['Prot Pot'		,'Protection Potion(green)'	,6,'offers some protection against attack',7],
     28: ['A Pot'			,'Attack Potion(red)'				,6,'increases your attack strength for some hits',12],
     29: ['Helmet'			,'Helmet'										,5,'defensive helmet, looks good too :)',3],
     30: ['X Helmet'		,'Reinforced Helmet'				,5,'a stronger helmet defends better',4],
     31: ['B Armour'		,'Body Armour'							,5,'provides good defensive capabilities',6],
     32: ['RB Armour'	,'Reinforced Body Armour'		,5,'excel at defense with this upgraded armour',8],
-    33: ['Axe'				,'Axe'											,4,'good for chopping down tress, and the enemy...',3],
-    34: ['R Axe'			,'Refined Axe'							,4,'a finer tipped axe for better chopping',5],
-    35: ['L3 Axe'			,'Level 3 Axe'							,4,'when only the best will do',7],
-    36: ['TB Axe'			,'Twin Blade Axe'						,4,'Twin Bladed for double the action',7],
-    37: ['RTB Axe'		,'Refined Twin Blade Axe'		,4,'another stronger twin bladed axe',8],
-    38: ['L3 TB Axe'	,'Level 3 Twin Blade Axe'		,4,'the pinnacle of axe technology',10]
+    33: ['Axe'				,'Axe'											,4,'good for chopping down tress, and the enemy...',5],
+    34: ['R Axe'			,'Refined Axe'							,4,'a finer tipped axe for better chopping',7],
+    35: ['L3 Axe'			,'Level 3 Axe'							,4,'when only the best will do',9],
+    36: ['TB Axe'			,'Twin Blade Axe'						,4,'Twin Bladed for double the action',11],
+    37: ['RTB Axe'		,'Refined Twin Blade Axe'		,4,'another stronger twin bladed axe',12],
+    38: ['L3 TB Axe'	,'Level 3 Twin Blade Axe'		,4,'the pinnacle of axe technology',14]
     }
+}
+export const startBonus=hero=>{
+	// console.log('hero',hero)
+	let startingBonus =  {
+		mage:{14:2,27:2,26:2,34:1,22:1,13:1},
+		healer:{14:2,26:2,24:2,16:1,22:1,13:1},
+		ninja:{9:3,10:3,14:2,18:1,22:1,13:1},
+		ranger:{11:2,10:2,9:2,14:2,33:1,22:1,13:1}
+	}
+	return startingBonus[hero]
 }
 
 export const presetData=()=>{
 	return {
 		1:{
 			level:'easy',
-			grid:60,
+			grid:50,
 			enemies: 6,
-			bonuses: 29,
+			bonuses: 10,
 			width:12,
 			height:12,
-			rooms:8,
+			rooms:12,
 			hero:'ninja_m',
 			preset:1
 		},
 		2: {
 			level:'medium',
 			grid:80,
-			enemies: 10,
-			bonuses: 20,
+			enemies: 8,
+			bonuses: 10,
 			width:12,
 			height:14,
-			rooms:10,
-			hero:'ninja_m',
+			rooms:15,
+			hero:'ranger_m',
 			preset:2        
 		},
 		3: {
 			level:'hard',
-			grid:120,
-			enemies: 20,
-			bonuses: 10,
-			width:20,
-			height:20,
-			rooms:15,
+			grid:100,
+			enemies: 13,
+			bonuses: 9,
+			width:18,
+			height:16,
+			rooms:30,
 			hero:'ninja_m',
 			preset:3        
 		},
 		4: {
-			level:'unfair',
+			level:'you will not survive',
 			grid:150,
 			enemies: 25,
-			bonuses: 5,
+			bonuses: 10,
 			width:25,
 			height:20,
-			rooms:25,
+			rooms:60,
 			hero:'ninja_m',
 			preset:4        
 		}
@@ -103,38 +111,38 @@ export const presetData=()=>{
 export const optionMinMax=()=>{
 	return {
 		grid:{
-			min:60,
-			max:200,
-			default:70,
+			min:50,
+			max:150,
+			default:60,
 			name:'grid',
 			label:'Dungeon Size'},
 		enemies:{
-			min:1,
-			max:30,
+			min:7,
+			max:25,
 			default:8,
 			name:'enemies',
 			label:'% enemies'},
 		bonuses:{
-			min:1,
-			max:30,
+			min:7,
+			max:20,
 			default:8,
 			name:'bonuses',
 			label:'% bonuses'},
 		width:{
-			min:5,
+			min:6,
 			max:26,
 			default:10,
 			name:'width',
 			label:'Room Max Width'},
 		height:{
-			min:5,
+			min:6,
 			max:26,
 			default:10,
 			name:'height',
 			label:'Room max Height'},
 		rooms:{
-			min:3,
-			max:200,
+			min:6,
+			max:80,
 			default:10,
 			name:'rooms',
 			label:'Max Rooms'}
@@ -152,16 +160,11 @@ export const grid =()=>{
 
 export const players=sex=>{
 	return {
-		name:['mage_'+sex,'healer_'+sex,'ninja_'+sex,'ranger_'+sex],
-		startingBonus: {
-			mage:'soemthing for mage',
-			healer:'something for healer',
-			ninja:'something for ninja',
-			ranger:'something for ranger'
-		}
+		name:['mage_'+sex,'healer_'+sex,'ninja_'+sex,'ranger_'+sex]
 	}
 
 }
+
 
 export const wallList=()=> {
 		return {

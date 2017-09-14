@@ -22,6 +22,7 @@ export default function initialize(props)
   //tileAtlas includes wall, floors, bonuses etc  
   this.tileAtlas = this.loader.getImage('tiles');
   this.floorTile = this.loader.getImage('floor');
+  this.exitTile = this.loader.getImage('exit');
   //screen menu is the box on the right
   this.screenMenu = this.loader.getImage('screen')
   this.hero = new Hero({
@@ -35,13 +36,13 @@ export default function initialize(props)
     enemies:this.enemies
   });
   this.gameNotes = gameNotes.bind(this)
-  props.notifier('Hero is on the move')
+  // props.notifier('Hero is on the move')
   this.camera = new Camera({
     map:props.map, 
     width:nap.width, 
     height:nap.height
   });
-  props.notifier('Camera view is active')
+  // props.notifier('Camera view is active')
   this.camera.follow(this.hero);
   this.position=()=>{
     return [this.hero.x,this.hero.y];

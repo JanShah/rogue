@@ -25,7 +25,7 @@ export default class Enemy {
     this.mover = [0.01,...move]
     this.changeDirection=rw(60,250)
     this.map= props.map
-    this.hp = rw(this.heroMax-50,this.heroMax)
+    this.hp = rw(this.heroMax-30,this.heroMax)
     this.id=props.id
     this.x= props.x
     this.y = props.y
@@ -34,12 +34,12 @@ export default class Enemy {
     this.frameHeight=188
     this.width= 32
     this.height= 47
-    // this.xp = rw(20,90)
+    this.xp = rw(3,12)
     this.image=props.loader.getImage('enemies'+props.ref)
-    this.SPEED=rw(250,300)
+    this.SPEED=rw(240,290)
     this.skip = 7 //skip frames to slow down walking animation
     this.positions = positions.bind(this)
-    this.visibility = rw(150,200)
+    this.visibility = rw(150,220)
     this.stuck=false
     this.healthWarning = ()=>this.hp<30
     //this fight is called by the hero.
@@ -75,7 +75,6 @@ export default class Enemy {
       if(one<this.visibility&&two<this.visibility)
       {
         this.seenHero=true
-        // console.log('seen on XY')
         let x = heroPos[0]>this.x?1:-1
         x = one>10?x:0
         let y = x?0:heroPos[1]>this.y?1:-1
@@ -133,12 +132,10 @@ export default class Enemy {
             this.mover=[0.01,...move]
           }
         }
-        // this.whichDirection([[this.x,this.y],hero.xy])
-        let hitPoints = rw(hero.xp/4,hero.xp/2)
-        // console.log('enemy took hit: '+ hitPoints)
+        this.heroMax+=1
         this.hp-=rw(hero.xp/2,hero.xp)
 
-        return {hit:rules,...hits,hitPoints:Math.ceil(hitPoints)}
+        return {hit:rules,...hits,hitPoints:this.xp}
       } 
       else 
       {

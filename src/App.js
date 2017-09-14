@@ -342,8 +342,8 @@ class App extends Component {
 				secondary={!this.state.started} 
 				value={
 					p===4
-					?'return to: '+presets[1].level
-					:'Preset level: '+presets[p+1].level
+					?'Return to '+presets[1].level
+					:'Try '+presets[p+1].level + ' Level'
 				} 
 			onClick={this.presets}
 			/>

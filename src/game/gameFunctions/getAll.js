@@ -1,5 +1,4 @@
-export default function getAll(delta) 
-{
+export default function getAll(delta) {
     //get the sprite
     this.getSprite(this.hero)
    //render the sprite and everything around it

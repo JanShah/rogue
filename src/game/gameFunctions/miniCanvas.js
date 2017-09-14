@@ -1,6 +1,3 @@
-// import nap from '../../constants/nap'
-
-
 export default function miniCanvas(props) 
 {
       const canvas = document.getElementById('miniMap')
@@ -19,14 +16,9 @@ export default function miniCanvas(props)
           canvas.width = width/3.5
           canvas.height = height/3.5
           destinationCtx = canvas.getContext('2d');
-          console.log(this.hero)
           //get the destination context
           let count = this.hero.stats.bonuses[9]
           let scale = count===1?1.5:count===2?2:count===3?3:count===4?3.5:3.5
-          // let sc = this.hero.stats.bonuses[9]>1
-          //   ?3.5
-          //   :miniMap
-          //scale the output according to bonus level 2 and 4, more maps means it lasts longer
           destinationCtx.scale(1/scale,1/scale)
           //draw the image
           if(count===2) destinationCtx.translate(-this.hero.screenX/2,-this.hero.screenY/2)

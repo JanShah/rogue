@@ -15,7 +15,7 @@ export default function spawnEnemy(props,enemy)
   if(!enCount) {
     enCount+=1
     this.enemies.push(aNewEnemy)
-    props.notifier('an enemy has spawned')
-    props.notifier('there are now '+this.enemies.length+' Enemies')
+    let enemyText = this.enemies.length===1?'1 Enemy':this.enemies.length+' Enemies'
+    props.notifier('Enemy: spawned. '+enemyText)
   }
 }

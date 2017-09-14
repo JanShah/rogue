@@ -21,6 +21,7 @@ import whatIsBonus from '../game/gameFunctions/whatIsBonus'
 import seeBonus from '../game/gameFunctions/seeBonus'
 import drawBonus from '../game/gameFunctions/drawBonus'
 import drawFloor from '../game/gameFunctions/drawFloor'
+import drawExit from '../game/gameFunctions/drawExit'
 import getCircle from '../game/gameFunctions/getCircle'
 // import drawDpad from '../game/gameFunctions/drawDpad'
 
@@ -40,6 +41,7 @@ export default class {
     this.getAll=getAll.bind(this)
     this.drawEnemies=drawEnemies.bind(this,props)
     this.drawFloor=drawFloor.bind(this,props)
+    this.drawExit=drawExit.bind(this,props)
     this.getSprite=getSprite.bind(this)
     this.sa=0
     this.skipCount=0
