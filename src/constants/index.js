@@ -13,9 +13,9 @@ export const boxGrid=()=>{
 export const bonusNames = () =>{
 	return {
 				//shortname//name //type //description //value
-    6 : ['B Gem'			,'Blue Gem'									,1,'increase max health',20],
-    7 : ['G Gem'			,'Green Gem'								,1,'restore some HP',30],
-    8 : ['R Gem'			,'Red Gem'									,1,'increase XP',10],
+    6 : ['B Gem'			,'Blue Gem'									,1,'increase max health',10],
+    7 : ['G Gem'			,'Green Gem'								,1,'restore some HP',20],
+    8 : ['R Gem'			,'Red Gem'									,1,'increase XP',3],
     9 : ['Scroll'			,'Scroll'										,2,'view Mini Map. Time limited',900],
     10: ['Letter'			,'Letter'										,2,'Increased Visibility Range. Time ',1100],
     11: ['Map'				,'Map'											,2,'Make a trail of your travelled route.',600],
@@ -33,9 +33,9 @@ export const bonusNames = () =>{
     23: ['RS Shield'	,'Reinforced Small Shield'	,5,'a better shield, still too small for some..',6],
     24: ['L Shield'		,'large Shield'							,5,'offers more protection against attack',9],
     25: ['RL Shield'	,'Reinforced Large Shield'	,5,'high defensive capabilities',11],
-    26: ['H Pot'			,'Health Potion(blue)'			,6,'will restore your health when needed.',45],
+    26: ['H Pot'			,'Health Potion(blue)'			,6,'will restore your health when needed.',35],
     27: ['Prot Pot'		,'Protection Potion(green)'	,6,'offers some protection against attack',7],
-    28: ['A Pot'			,'Attack Potion(red)'				,6,'increases your attack strength for some hits',12],
+    28: ['A Pot'			,'Attack Potion(red)'				,6,'increases your attack strength for some hits',8],
     29: ['Helmet'			,'Helmet'										,5,'defensive helmet, looks good too :)',3],
     30: ['X Helmet'		,'Reinforced Helmet'				,5,'a stronger helmet defends better',4],
     31: ['B Armour'		,'Body Armour'							,5,'provides good defensive capabilities',6],
@@ -51,10 +51,10 @@ export const bonusNames = () =>{
 export const startBonus=hero=>{
 	// console.log('hero',hero)
 	let startingBonus =  {
-		mage:{14:2,27:2,26:2,34:1,22:1,13:1},
-		healer:{14:2,26:2,24:2,16:1,22:1,13:1},
-		ninja:{9:3,10:3,14:2,18:1,22:1,13:1},
-		ranger:{11:2,10:2,9:2,14:2,33:1,22:1,13:1}
+		mage:{14:2,27:2,26:2,34:1,22:1},
+		healer:{14:2,26:2,24:2,16:1,22:1},
+		ninja:{9:3,10:3,14:2,18:1,22:1},
+		ranger:{11:2,10:2,9:2,14:2,33:1,22:1}
 	}
 	return startingBonus[hero]
 }
@@ -66,8 +66,8 @@ export const presetData=()=>{
 			grid:50,
 			enemies: 6,
 			bonuses: 10,
-			width:12,
-			height:12,
+			width:6,
+			height:6,
 			rooms:12,
 			hero:'ninja_m',
 			preset:1
@@ -77,8 +77,8 @@ export const presetData=()=>{
 			grid:80,
 			enemies: 8,
 			bonuses: 10,
-			width:12,
-			height:14,
+			width:10,
+			height:12,
 			rooms:15,
 			hero:'ranger_m',
 			preset:2        

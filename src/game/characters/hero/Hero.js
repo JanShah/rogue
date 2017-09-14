@@ -2,7 +2,7 @@ import Stats from './Stats'
 import { bonusNames } from '../../../constants/'
 import positions from '../positions'
 import getHP from '../getHP'
-import xpBar from '../xpBar'
+import hpBar from '../hpBar'
 import bonusTotal from '../../gameFunctions/bonusTotal'
 let newDelta
 
@@ -11,7 +11,7 @@ export default class Hero {
   constructor(props) 
   {
     this.wins = false
-    this.coinsNeeded = Math.ceil(props.map.roomcount/2)
+    this.coinsNeeded = props.map.roomcount<5?2:Math.max(props.map.roomcount-4,3)
     let startPoint = props.map.startingPoint
     this.stats=new Stats(props.hero)
     this.seenByEnemy = false
@@ -21,7 +21,7 @@ export default class Hero {
     this.frameWidth=96
     this.frameHeight=144
     this.width= 32
-    this.height= 36
+    this.height= 36 
     this.visibility=200
     this.defence=0
     this.attack=0
@@ -110,8 +110,8 @@ export default class Hero {
       }
       if(this.stats.bonuses[8]) 
       {
-        props.notifier('Gem: Red increases XP by 5')
-        this.stats.xp+=5
+        props.notifier('Gem: Red increases XP by 3')
+        this.stats.xp+=3
         this.stats.bonuses[8]-=1
       }
     }
@@ -247,41 +247,26 @@ export default class Hero {
         return enemy.seenHero
       })
       enemies.forEach(enemy=>{
-        xpBar(getHP({maxHP:this.stats.maxHP,hp:this.stats.hp,x:this.screenX-10,y:this.screenY}))
+        hpBar(getHP({maxHP:this.stats.maxHP,hp:this.stats.hp,x:this.screenX-10,y:this.screenY}))
 
         let totalFight = this.stats.xp + this.weaponBonus();
         let fought = enemy.fight({...this.positions(),xp:totalFight,xy:[this.x,this.y]})
-        if(fought.hit)
-        {
+        if(fought.hit) {
           this.defence = this.defencePotion() + this.defenceShields() + this.defenceArmour()
           this.hitCounter+=1
           this.weaponBonus(true)
-          // console.log('my x y : ',
-          // this.x,this.y,
-          // 'enemy:' ,fought.xy)
-          if(fought.xy[0]<this.x&&(fought.xy[1]-20<this.y&&fought.xy[1]+20>this.y))
-          {
-            // console.log('left')
-            this.move(newDelta,2,0)
-          }
-          else if(fought.xy[0]>this.x&&(fought.xy[1]-20<this.y&&fought.xy[1]+20>this.y))
-          {
-            // console.log('right')
-            this.move(newDelta,-2,0)
-          }
-          else if(fought.top)
-          {
-            // console.log('top')
-            this.move(newDelta,0,-2)
-          }
-          else if(fought.bottom)
-          {
-            // console.log('bottom')
-            this.move(newDelta,0,2)
+          if(fought.xy[0]<this.x&&(fought.xy[1]-20<this.y&&fought.xy[1]+20>this.y)) {
+            this.move(newDelta,4,0)
+          } else if(fought.xy[0]>this.x&&(fought.xy[1]-20<this.y&&fought.xy[1]+20>this.y)) {
+            this.move(newDelta,-4,0)
+          } else if(fought.xy[1]>this.y&&(fought.xy[0]-20<this.x&&fought.xy[0]+20>this.x)) {
+            this.move(newDelta,0,-4)
+          } else {
+            this.move(newDelta,0,4)
           }
           //each enemy hit is set according to the enemy starting xp.
           //xp is gained through kills and red gems and improves attack
-          let enemyHit = Math.max(fought.hitPoints-this.defence,0)
+          let enemyHit = Math.max(fought.hitPoints-this.defence,1)
           
           this.stats.hp-=enemyHit
         } 
@@ -289,8 +274,7 @@ export default class Hero {
     }
 
 
-    this.collide = function (dirx, diry) 
-    {
+    this.collide = function (dirx, diry) {
         let p  = this.positions()
         let row, col;
         // -1 in right and bottom
@@ -326,12 +310,9 @@ export default class Hero {
               // console.log('bonus: ',collision,props )
               this.stats.pickedBonuses+=1
               // console.log(collision)
-              if(this.stats.bonuses[collision[2]])
-              {
+              if(this.stats.bonuses[collision[2]]) {
                 this.stats.bonuses[collision[2]]+=1
-              }
-              else
-              {
+              } else {
                 this.stats.bonuses[collision[2]]=1
               }
               props.notifier('Picked up : '+bon);
@@ -341,29 +322,21 @@ export default class Hero {
             } else  return
           }
 
-        if (diry > 0) 
-        {
+        if (diry > 0) {
             row = this.map.getRow(p.bottom);
             this.y = -this.height / 2 + this.map.getY(row);
-        }
-        else if (diry < 0) 
-        {
+        } else if (diry < 0) {
             row = this.map.getRow(p.top);
             this.y = this.height / 2 + this.map.getY(row + 1);
-        }
-        else if (dirx > 0) 
-        {
+        } else if (dirx > 0) {
             col = this.map.getCol(p.right);
             this.x = -this.width / 2 + this.map.getX(col);
-        }
-        else if (dirx < 0) 
-        {
+        } else if (dirx < 0) {
             col = this.map.getCol(p.left);
             this.x = this.width / 2 + this.map.getX(col + 1);
         }
     };
-    this.move=(delta,dirX,dirY)=>
-    {
+    this.move=(delta,dirX,dirY)=>{
       newDelta = delta
       this.x+= dirX * this.SPEED * delta
       this.y+= dirY * this.SPEED * delta

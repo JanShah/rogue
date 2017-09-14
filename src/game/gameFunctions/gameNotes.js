@@ -28,7 +28,7 @@ export default function gameNotes() {
         if(bonus[2]>=this.hero.coinsNeeded) {
           ctx.font = 'bold 18px Arial'
           ctx.fillStyle='#60e052'
-          ctx.fillText('You have the coins, get to the Exit!',30,12,250)      
+          ctx.fillText('An Exit has appeared, find it and win!!',30,15,350)      
         } else {
           ctx.fillText(bonus[0]+' qty: '+bonus[2]+' / '+this.hero.coinsNeeded,30,12,250)      
         }
